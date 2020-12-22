@@ -17,7 +17,8 @@ namespace Sandbox.Renderobjects
      */
     public class RenderChunk
     {
-        private GameObject obj;
+        private Mesh mesh;
+        private Material material;
         private RenderBlock[,,] octChunk;
         private int blockCount = 0;
 
@@ -77,25 +78,14 @@ namespace Sandbox.Renderobjects
             return octChunk;
         }
 
-        /**
-         * <summary>Get the actual Game Object for this chunk.</summary>
-         * <remarks>This value can be null if the chunk is being unloaded, regenerated, or loaded in.</remarks>
-         * <returns>The game object for this chunk.</returns>
-         */
-        public GameObject GetGameObject()
+        public Mesh GetMesh()
         {
-            return obj;
+            return mesh;
         }
 
-        /**
-         * <summary>Destroy the game object for this chunk.</summary>
-         * <remarks>Internal use only.</remarks>
-         */
-        public void DestroyGameObject()
+        public Material GetMaterial()
         {
-            GameObject temp = obj;
-            obj = null;
-            UnityEngine.Object.DestroyImmediate(temp.gameObject);
+            return material;
         }
 
         /**
@@ -120,18 +110,6 @@ namespace Sandbox.Renderobjects
             this.position.x = x;
             this.position.y = y;
             this.position.z = z;
-        }
-
-        /**
-         * <summary>Get the chunk class for this chunk.</summary>
-         * <remarks>This can return null for the same conditions of <see cref="GetGameObject"/></remarks>
-         * <returns>The chunk class.</returns>
-         */
-        public Chunk GetChunk()
-        {
-            if (obj == null)
-                return null;
-            return obj.GetComponent<Chunk>();
         }
 
         /**
@@ -228,16 +206,11 @@ namespace Sandbox.Renderobjects
                     colors.Add(rb.GetColor());
                 count += rb.GetVisibleFaces().Count * 4;
             }
+
+            Material material = WorldManager.GetInstance().mainMaterial;
+            //material.mainTexture = atlas.GetTexture();
             SandboxManager.GetInstance().AddAction(() =>
             {
-                GameObject gameObject = new GameObject("Chunk{" + position.x + ", " + position.y + ", " + position.z + "}");
-                MeshFilter filter = gameObject.AddComponent<MeshFilter>();
-                MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-                Chunk chunk = gameObject.AddComponent<Chunk>();
-                chunk.renderChunk = this;
-
-                meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
-
                 Mesh mesh = new Mesh();
 
                 mesh.vertices = positions.ToArray();
@@ -246,14 +219,7 @@ namespace Sandbox.Renderobjects
                 mesh.uv = textures.ToArray();
                 mesh.colors = colors.ToArray();
 
-                filter.mesh = mesh;
-
-                gameObject.GetComponent<Renderer>().material.mainTexture = atlas.GetTexture();
-
-                if (obj != null)
-                    UnityEngine.Object.Destroy(obj);
-                obj = gameObject;
-                obj.transform.position = position * CHUNK_SIZE;
+                this.mesh = mesh;
             });
         }
     }

@@ -35,6 +35,7 @@ public class WorldManager : MonoBehaviour
 
     private bool loaded = false;
 
+    public Material mainMaterial;
 
     // Start is called before the first frame update
 
@@ -53,6 +54,9 @@ public class WorldManager : MonoBehaviour
         this.atlasTextures = atlasTextures;
 
         TextureAtlas atlas = new TextureAtlas(atlasTextures, Application.dataPath + "/test_atlas.png");
+
+        mainMaterial = new Material(Shader.Find("Standard"));
+        mainMaterial.mainTexture = atlas.GetTexture();
 
         this.textureAtlas = atlas;
         LoadChunk(new Vector3(0, 0, 0));
@@ -82,7 +86,6 @@ public class WorldManager : MonoBehaviour
                     if (Vector3.Distance(mainCameraPos / RenderChunk.CHUNK_SIZE, chunk.GetPosition()) > RenderDistance / 2 + 1)
                     {
                         bool res = chunks.TryRemove(chunk.GetPosition(), out _);
-                        SandboxManager.GetInstance().AddAction(() => chunk.DestroyGameObject());
                     }
 
                     //if (Vector3.Distance(mainCameraPos / 16, chunk.GetPosition()) < 4 || Vector3.Distance(mainCameraPos / 16, chunk.GetPosition()) > 7) continue;
@@ -124,6 +127,11 @@ public class WorldManager : MonoBehaviour
     {
         // Update the main camera position which is used in the loading thread.
         mainCameraPos = Camera.main.transform.position;
+
+        foreach(RenderChunk chunk in chunks.Values)
+        {
+            Graphics.DrawMesh(chunk.GetMesh(), chunk.GetPosition() * RenderChunk.CHUNK_SIZE, Quaternion.identity, mainMaterial, 0);
+        }
     }
 
     /**
