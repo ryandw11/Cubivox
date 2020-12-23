@@ -236,7 +236,7 @@ namespace Sandbox.Renderobjects
                 Chunk chunk = gameObject.AddComponent<Chunk>();
                 chunk.renderChunk = this;
 
-                meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
+                meshRenderer.sharedMaterial = WorldManager.GetInstance().mainMaterial;
 
                 Mesh mesh = new Mesh();
 
@@ -247,8 +247,6 @@ namespace Sandbox.Renderobjects
                 mesh.colors = colors.ToArray();
 
                 filter.mesh = mesh;
-
-                gameObject.GetComponent<Renderer>().material.mainTexture = atlas.GetTexture();
 
                 if (obj != null)
                     UnityEngine.Object.Destroy(obj);

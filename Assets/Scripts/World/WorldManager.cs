@@ -35,6 +35,8 @@ public class WorldManager : MonoBehaviour
 
     private bool loaded = false;
 
+    public Material mainMaterial;
+
 
     // Start is called before the first frame update
 
@@ -53,6 +55,9 @@ public class WorldManager : MonoBehaviour
         this.atlasTextures = atlasTextures;
 
         TextureAtlas atlas = new TextureAtlas(atlasTextures, Application.dataPath + "/test_atlas.png");
+
+        mainMaterial = new Material(Shader.Find("Standard"));
+        mainMaterial.mainTexture = atlas.GetTexture();
 
         this.textureAtlas = atlas;
         LoadChunk(new Vector3(0, 0, 0));
