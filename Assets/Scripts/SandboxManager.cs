@@ -19,6 +19,7 @@ public class SandboxManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 60;
         instance = this;
     }
 
@@ -50,8 +51,7 @@ public class SandboxManager : MonoBehaviour
         if (mainThreadQueue.Count > 0)
         {
             mainThreadQueue.Dequeue().Invoke();
-        }
-        /*
+        }   
         if (mainThreadQueue.Count > 0)
         {
             mainThreadQueue.Dequeue().Invoke();
@@ -60,6 +60,6 @@ public class SandboxManager : MonoBehaviour
         {
             mainThreadQueue.Dequeue().Invoke();
         }
-        */
+        
     }
 }

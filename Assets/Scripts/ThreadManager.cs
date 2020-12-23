@@ -35,10 +35,12 @@ public class ThreadManager : MonoBehaviour
                         threadQueue.Dequeue().Invoke();
                     }
                 }
+                Thread.Sleep(100);
             }
         });
         threads[0].Start();
 
+        
         // Thread 2
         threads[1] = new Thread(() =>
         {
@@ -51,9 +53,11 @@ public class ThreadManager : MonoBehaviour
                         threadQueue.Dequeue().Invoke();
                     }
                 }
+                Thread.Sleep(100);
             }
         });
         threads[1].Start();
+        
     }
 
     /**

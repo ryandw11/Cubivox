@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
 using Sandbox.Renderobjects;
@@ -64,14 +65,16 @@ public class WorldManager : MonoBehaviour
 
         ThreadManager.GetInstance().AddAction(() =>
         {
-            for (int cx = -10; cx < 10; cx++)
+            for(int cy = 0; cy < 1; cy++)
             {
-                for (int cz = -10; cz < 10; cz++)
+                for (int cx = -10; cx < 10; cx++)
                 {
-                    LoadChunk(new Vector3(cx, 0, cz));
+                    for (int cz = -10; cz < 10; cz++)
+                    {
+                        LoadChunk(new Vector3(cx, cy, cz));
+                    }
                 }
             }
-            loaded = true;
         });
 
         // Setup the main thread for loading and unloading chunks.
@@ -79,10 +82,9 @@ public class WorldManager : MonoBehaviour
         handleChunkLoading = new Thread(() => {
             while (true)
             {
-                if (!loaded) continue;
                 foreach (RenderChunk chunk in chunks.Values)
                 {
-
+                    if (!chunk.IsLoaded()) continue;
 
                     if (Vector3.Distance(mainCameraPos / RenderChunk.CHUNK_SIZE, chunk.GetPosition()) > RenderDistance / 2 + 1)
                     {
@@ -112,6 +114,7 @@ public class WorldManager : MonoBehaviour
 
 
                 }
+                Thread.Sleep(100);
             }
         });
 
@@ -169,10 +172,13 @@ public class WorldManager : MonoBehaviour
     {
         if (chunks.ContainsKey(position)) return;
         Block bl = ItemManager.GetInstance().GetObjectByName<Block>("Block");
-
+        RenderChunk chunk = new RenderChunk(new List<RenderBlock>(), textureAtlas);
+        lock (chunks)
+        {
+            chunks.TryAdd(position, chunk);
+        }
         ThreadManager.GetInstance().AddAction(() =>
         {
-            RenderChunk chunk = new RenderChunk(new List<RenderBlock>(), textureAtlas);
             for (int x = 0; x < RenderChunk.CHUNK_SIZE; x++)
             {
                 for (int y = 0; y < RenderChunk.CHUNK_SIZE; y++)
@@ -187,10 +193,6 @@ public class WorldManager : MonoBehaviour
             }
             chunk.SetPosition((int)position.x, (int)position.y, (int)position.z);
             chunk.RegenerateChunkObject(textureAtlas);
-            lock (chunks)
-            {
-                chunks.TryAdd(position, chunk);
-            }
         });
     }
 
