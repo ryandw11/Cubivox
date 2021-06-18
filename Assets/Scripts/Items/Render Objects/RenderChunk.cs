@@ -136,6 +136,10 @@ namespace Sandbox.Renderobjects
             return obj.GetComponent<Chunk>();
         }
 
+        /// <summary>
+        /// Check if a chunk is loaded.
+        /// </summary>
+        /// <returns>If the chunk is loaded.</returns>
         public bool IsLoaded()
         {
             return isLoaded;

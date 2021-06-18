@@ -114,7 +114,9 @@ public class WorldManager : MonoBehaviour
 
 
                 }
-                Thread.Sleep(100);
+
+                // Prevent heavy use of the CPU.
+                Thread.Sleep(50);
             }
         });
 
