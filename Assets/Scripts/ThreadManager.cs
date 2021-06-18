@@ -35,10 +35,14 @@ public class ThreadManager : MonoBehaviour
                         threadQueue.Dequeue().Invoke();
                     }
                 }
+                // Sleep for longer when there is nothing in the queue to proccess.
+                // This is done to control the CPU usage of the game.
+                Thread.Sleep(threadQueue.Count > 2 ? 20 : 50);
             }
         });
         threads[0].Start();
 
+        
         // Thread 2
         threads[1] = new Thread(() =>
         {
@@ -51,9 +55,13 @@ public class ThreadManager : MonoBehaviour
                         threadQueue.Dequeue().Invoke();
                     }
                 }
+                // Sleep for longer when there is nothing in the queue to proccess.
+                // This is done to control the CPU usage of the game.
+                Thread.Sleep(threadQueue.Count > 2 ? 20 : 50);
             }
         });
         threads[1].Start();
+        
     }
 
     /**
@@ -75,12 +83,6 @@ public class ThreadManager : MonoBehaviour
     public static ThreadManager GetInstance()
     {
         return instance;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     private void OnDestroy()

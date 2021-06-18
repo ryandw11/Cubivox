@@ -7,6 +7,8 @@ using UnityEngine;
  * <summary>
  * This is the general manager for the game.
  * 
+ * <para>This class allows for things to be called on the main thread. <see cref="AddAction(System.Action)"/></para>
+ * 
  * <para>Get the instance of this class using <see cref="GetInstance"/></para>
  * </summary>
  */
@@ -19,6 +21,7 @@ public class SandboxManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        Application.targetFrameRate = 70;
         instance = this;
     }
 
@@ -50,8 +53,7 @@ public class SandboxManager : MonoBehaviour
         if (mainThreadQueue.Count > 0)
         {
             mainThreadQueue.Dequeue().Invoke();
-        }
-        /*
+        }   
         if (mainThreadQueue.Count > 0)
         {
             mainThreadQueue.Dequeue().Invoke();
@@ -60,6 +62,6 @@ public class SandboxManager : MonoBehaviour
         {
             mainThreadQueue.Dequeue().Invoke();
         }
-        */
+        
     }
 }

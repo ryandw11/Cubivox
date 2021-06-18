@@ -20,6 +20,7 @@ namespace Sandbox.Renderobjects
         private GameObject obj;
         private RenderBlock[,,] octChunk;
         private int blockCount = 0;
+        private bool isLoaded;
 
         public readonly static int CHUNK_SIZE = 12;
 
@@ -40,6 +41,7 @@ namespace Sandbox.Renderobjects
                 octChunk[(int)blck.GetPosition().x, (int)blck.GetPosition().y, (int)blck.GetPosition().z] = blck;
             }
             blockCount = blocks.Count;
+            isLoaded = false;
         }
 
         /**
@@ -132,6 +134,15 @@ namespace Sandbox.Renderobjects
             if (obj == null)
                 return null;
             return obj.GetComponent<Chunk>();
+        }
+
+        /// <summary>
+        /// Check if a chunk is loaded.
+        /// </summary>
+        /// <returns>If the chunk is loaded.</returns>
+        public bool IsLoaded()
+        {
+            return isLoaded;
         }
 
         /**
@@ -231,12 +242,13 @@ namespace Sandbox.Renderobjects
             SandboxManager.GetInstance().AddAction(() =>
             {
                 GameObject gameObject = new GameObject("Chunk{" + position.x + ", " + position.y + ", " + position.z + "}");
+                MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
                 MeshFilter filter = gameObject.AddComponent<MeshFilter>();
                 MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
                 Chunk chunk = gameObject.AddComponent<Chunk>();
                 chunk.renderChunk = this;
 
-                meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
+                meshRenderer.sharedMaterial = WorldManager.GetInstance().mainMaterial;
 
                 Mesh mesh = new Mesh();
 
@@ -247,13 +259,13 @@ namespace Sandbox.Renderobjects
                 mesh.colors = colors.ToArray();
 
                 filter.mesh = mesh;
-
-                gameObject.GetComponent<Renderer>().material.mainTexture = atlas.GetTexture();
+                meshCollider.sharedMesh = mesh;
 
                 if (obj != null)
                     UnityEngine.Object.Destroy(obj);
                 obj = gameObject;
                 obj.transform.position = position * CHUNK_SIZE;
+                isLoaded = true;
             });
         }
     }
