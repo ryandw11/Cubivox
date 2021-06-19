@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Sandbox.Renderobjects
+namespace Cubvox.Renderobjects
 {
     /**
      * <summary>
@@ -239,7 +239,7 @@ namespace Sandbox.Renderobjects
                     colors.Add(rb.GetColor());
                 count += rb.GetVisibleFaces().Count * 4;
             }
-            SandboxManager.GetInstance().AddAction(() =>
+            CubvoxManager.GetInstance().AddAction(() =>
             {
                 GameObject gameObject = new GameObject("Chunk{" + position.x + ", " + position.y + ", " + position.z + "}");
                 MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();

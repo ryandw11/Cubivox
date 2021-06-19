@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Threading;
 using UnityEngine;
-using Sandbox.Renderobjects;
-using Sandbox.Items;
+using Cubvox.Renderobjects;
+using Cubvox.Items;
 
 /**
  * <summary>
@@ -89,7 +89,7 @@ public class WorldManager : MonoBehaviour
                     if (Vector3.Distance(mainCameraPos / RenderChunk.CHUNK_SIZE, chunk.GetPosition()) > RenderDistance / 2 + 1)
                     {
                         bool res = chunks.TryRemove(chunk.GetPosition(), out _);
-                        SandboxManager.GetInstance().AddAction(() => chunk.DestroyGameObject());
+                        CubvoxManager.GetInstance().AddAction(() => chunk.DestroyGameObject());
                     }
 
                     //if (Vector3.Distance(mainCameraPos / 16, chunk.GetPosition()) < 4 || Vector3.Distance(mainCameraPos / 16, chunk.GetPosition()) > 7) continue;

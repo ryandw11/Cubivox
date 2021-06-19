@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Sandbox.Items
+namespace Cubvox.Items
 {
-    public class Item : SandboxObject
+    public class Item : CubvoxObject
     {
         private int xSize;
         private int ySize;

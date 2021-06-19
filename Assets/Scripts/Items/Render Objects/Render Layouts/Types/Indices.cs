@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Sandbox.Renderobjects
+namespace Cubvox.Renderobjects
 {
     public interface Indices
     {

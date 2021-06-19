@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Sandbox.Items;
-using Sandbox.Items.Default;
+using Cubvox.Items;
+using Cubvox.Items.Default;
 
 public class ItemManager : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class ItemManager : MonoBehaviour
 
     private List<Item> items = new List<Item>();
     private List<Block> blocks = new List<Block>();
-    private Dictionary<string, ISandboxObject> objects = new Dictionary<string, ISandboxObject>();
+    private Dictionary<string, ICubvoxObject> objects = new Dictionary<string, ICubvoxObject>();
 
     // Start is called before the first frame update
     void Start()
@@ -32,7 +32,7 @@ public class ItemManager : MonoBehaviour
         return instance;
     }
 
-    public void AddItem(ISandboxObject sandboxObject)
+    public void AddItem(ICubvoxObject sandboxObject)
     {
         this.objects.Add(sandboxObject.GetName(), sandboxObject);
         if (sandboxObject is Block)
@@ -51,12 +51,12 @@ public class ItemManager : MonoBehaviour
         return items;
     }
 
-    public Dictionary<string, ISandboxObject> GetSandboxObjects()
+    public Dictionary<string, ICubvoxObject> GetSandboxObjects()
     {
         return objects;
     }
 
-    public  T GetObjectByName<T>(string name) where T : ISandboxObject
+    public  T GetObjectByName<T>(string name) where T : ICubvoxObject
     {
         return (T) objects[name];
     }

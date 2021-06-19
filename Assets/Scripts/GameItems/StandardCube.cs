@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Sandbox.Items;
+using Cubvox.Items;
 
-namespace Sandbox.Items.Default
+namespace Cubvox.Items.Default
 {
     [Name("Block")]
     [Texture("ExampleBlock")]

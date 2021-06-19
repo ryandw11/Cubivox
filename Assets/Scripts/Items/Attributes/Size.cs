@@ -4,7 +4,7 @@ using UnityEngine;
 
 using System;
 
-namespace Sandbox.Items
+namespace Cubvox.Items
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class Size : Attribute

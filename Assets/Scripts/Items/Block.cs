@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Sandbox.Items
+namespace Cubvox.Items
 {
-    public class Block : SandboxObject
+    public class Block : CubvoxObject
     {
         protected Color color;
         public Block() : base()

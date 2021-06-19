@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
-using Sandbox.Renderobjects;
+using Cubvox.Renderobjects;
 
-namespace Sandbox.Items
+namespace Cubvox.Items
 {
-    public abstract class SandboxObject : ISandboxObject
+    public abstract class CubvoxObject : ICubvoxObject
     {
         protected string name;
         protected string texture;
         protected AtlasTexture atlasTexture;
 
-        public SandboxObject()
+        public CubvoxObject()
         {
             Name name = (Name)GetType().GetCustomAttributes(typeof(Name), true)[0];
             this.name = name.GetValue();

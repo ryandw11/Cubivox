@@ -1,6 +1,6 @@
-﻿namespace Sandbox.Items
+﻿namespace Cubvox.Items
 {
-    public interface ISandboxObject
+    public interface ICubvoxObject
     {
         string GetName();
         string GetTexture();
