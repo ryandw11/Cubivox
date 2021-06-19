@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Cubvox.Items;
+using Cubivox.Items;
 
-namespace Cubvox.Renderobjects
+namespace Cubivox.Renderobjects
 {
     /**
      * <summary>

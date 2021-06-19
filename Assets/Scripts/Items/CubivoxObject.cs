@@ -1,15 +1,15 @@
 ﻿using UnityEngine;
-using Cubvox.Renderobjects;
+using Cubivox.Renderobjects;
 
-namespace Cubvox.Items
+namespace Cubivox.Items
 {
-    public abstract class CubvoxObject : ICubvoxObject
+    public abstract class CubivoxObject : ICubivoxObject
     {
         protected string name;
         protected string texture;
         protected AtlasTexture atlasTexture;
 
-        public CubvoxObject()
+        public CubivoxObject()
         {
             Name name = (Name)GetType().GetCustomAttributes(typeof(Name), true)[0];
             this.name = name.GetValue();

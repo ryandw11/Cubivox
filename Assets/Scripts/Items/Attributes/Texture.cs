@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Cubvox.Items
+namespace Cubivox.Items
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class Texture : Attribute

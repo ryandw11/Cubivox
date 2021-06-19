@@ -1,6 +1,6 @@
-﻿namespace Cubvox.Items
+﻿namespace Cubivox.Items
 {
-    public interface ICubvoxObject
+    public interface ICubivoxObject
     {
         string GetName();
         string GetTexture();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using Cubvox.Renderobjects;
+using Cubivox.Renderobjects;
 
 /**
  * <summary>

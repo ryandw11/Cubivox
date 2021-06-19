@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cubvox.Renderobjects
+namespace Cubivox.Renderobjects
 {
     /**
      * <summary>This represents a texture on the texture atlas.</summary>

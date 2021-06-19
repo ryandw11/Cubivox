@@ -12,9 +12,9 @@ using UnityEngine;
  * <para>Get the instance of this class using <see cref="GetInstance"/></para>
  * </summary>
  */
-public class CubvoxManager : MonoBehaviour
+public class CubivoxManager : MonoBehaviour
 {
-    private static CubvoxManager instance;
+    private static CubivoxManager instance;
 
     private Queue<Action> mainThreadQueue = new Queue<Action>();
 
@@ -29,7 +29,7 @@ public class CubvoxManager : MonoBehaviour
      * <summary>Get the instance of this class.</summary>
      * <returns>The instance of this class.</returns>
      */
-    public static CubvoxManager GetInstance()
+    public static CubivoxManager GetInstance()
     {
         return instance;
     }

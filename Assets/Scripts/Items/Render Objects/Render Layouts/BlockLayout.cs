@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cubvox.Renderobjects
+namespace Cubivox.Renderobjects
 {
     /**
      * <summary>The basic block implementation of the block layout.</summary>

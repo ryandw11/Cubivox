@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Cubvox.Items
+namespace Cubivox.Items
 {
-    public class Item : CubvoxObject
+    public class Item : CubivoxObject
     {
         private int xSize;
         private int ySize;
