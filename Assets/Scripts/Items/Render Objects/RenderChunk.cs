@@ -70,6 +70,41 @@ namespace Cubivox.Renderobjects
             blockCount--;
         }
 
+        /// <summary>
+        /// Remove a Block from the Chunk if it exists.
+        /// </summary>
+        /// <param name="x">The relative x position.</param>
+        /// <param name="y">The relative y position.</param>
+        /// <param name="z">The relative z positon.</param>
+        public void RemoveBlock(int x, int y, int z)
+        {
+            if (!HasBlock(x, y, z))
+            {
+                Debug.Log("NOT FOUND!");
+                Debug.Log(x + " :: " + y + " :: " + y);
+                return;
+            }
+            octChunk[x, y, z].SetParentChunk(null);
+            octChunk[x, y, z] = null;
+            blockCount--;
+        }
+
+        /// <summary>
+        /// Check if a Voxel exists at the specified position.
+        /// </summary>
+        /// <param name="x">The x position.</param>
+        /// <param name="y">The y position.</param>
+        /// <param name="z">The z position.</param>
+        /// <returns>If the voxel exists within the chunk.</returns>
+        public bool HasBlock(int x, int y, int z)
+        {
+            if (x < 0 || x > CHUNK_SIZE) return false;
+            if (y < 0 || y > CHUNK_SIZE) return false;
+            if (z < 0 || z > CHUNK_SIZE) return false;
+
+            return octChunk[x, y, z] != null;
+        }
+
         /**
          * <summary>Get the OctChunk (3D array) of the chunk.</summary>
          * <returns>The 3D array of the chunk.</returns>
@@ -102,13 +137,22 @@ namespace Cubivox.Renderobjects
 
         /**
          * <summary>Get the position for the chunk.
-         * <para>This is in chunk coords, not world coords. Multiply by 16 to get world coords.</para>
+         * <para>This is in chunk coords, not world coords. <see cref="GetGlobalPosition"/> to get the global position.</para>
          * </summary>
          * <returns>The position of the chunk.</returns>
          */
         public Vector3 GetPosition()
         {
             return position;
+        }
+
+        /// <summary>
+        /// Get the global position for the Chunk.
+        /// </summary>
+        /// <returns>The global position of the chunk.</returns>
+        public Vector3 GetGlobalPosition()
+        {
+            return position * CHUNK_SIZE;
         }
 
         /**

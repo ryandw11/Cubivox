@@ -43,60 +43,60 @@ namespace Cubivox.Renderobjects
             public List<Vector3> GetFront()
             {
                 return new List<Vector3>() {
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z)
+                        new Vector3(0 + pos.x, 1f + pos.y, 0 + pos.z),
+                        new Vector3(0 + pos.x, 0 + pos.y, 0 + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 0 + pos.z),
+                        new Vector3(1f + pos.x, 1f + pos.y, 0 + pos.z)
                 };
             }
 
             public List<Vector3> GetBottom()
             {
                 return new List<Vector3>() {
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z)
+                        new Vector3(0 + pos.x, 0 + pos.y, 0 + pos.z),
+                        new Vector3(0 + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 0 + pos.z)
                 };
             }
 
             public List<Vector3> GetBack()
             {
                 return new List<Vector3>() {
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z)
+                        new Vector3(0 + pos.x, 1f + pos.y, 1f + pos.z),
+                        new Vector3(0 + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 1f + pos.y, 1f + pos.z)
                 };
             }
 
             public List<Vector3> GetLeft()
             {
                 return new List<Vector3>() {
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z)
+                        new Vector3(0 + pos.x, 1f + pos.y, 0 + pos.z),
+                        new Vector3(0 + pos.x, 0 + pos.y, 0 + pos.z),
+                        new Vector3(0 + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(0 + pos.x, 1f + pos.y, 1f + pos.z)
                 };
             }
 
             public List<Vector3> GetRight()
             {
                 return new List<Vector3>() {
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, -0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z)
+                        new Vector3(1f + pos.x, 1f + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 0 + pos.y, 0 + pos.z),
+                        new Vector3(1f + pos.x, 1f + pos.y, 0 + pos.z)
                 };
             }
 
             public List<Vector3> GetTop()
             {
                 return new List<Vector3>() {
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z),
-                        new Vector3(-0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, 0.5f + pos.z),
-                        new Vector3(0.5f + pos.x, 0.5f + pos.y, -0.5f + pos.z)
+                        new Vector3(0 + pos.x, 1f + pos.y, 0 + pos.z),
+                        new Vector3(0 + pos.x, 1f + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 1f + pos.y, 1f + pos.z),
+                        new Vector3(1f + pos.x, 1f + pos.y, 0 + pos.z)
                 };
             }
         }
