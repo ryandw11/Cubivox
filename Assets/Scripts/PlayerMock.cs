@@ -17,6 +17,7 @@ public class PlayerMock : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+
         if(Input.GetKeyUp(KeyCode.Mouse0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -55,6 +56,26 @@ public class PlayerMock : MonoBehaviour
                 renderChunk.RemoveBlock(block);
                 renderChunk.RegenerateChunkObject(WorldManager.GetInstance().GetTextureAtlas());
             }*/
+        }
+
+        if (Input.GetKeyUp(KeyCode.Mouse1))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            float step = 0.3f;
+            while (step < 20)
+            {
+                Vector3 position = ray.origin + (ray.direction * step);
+                position.z -= 1;
+                position.x -= position.x < 0 ? 1 : 0;
+                if (WorldManager.GetInstance().LoadedBlockExists((int)position.x, (int)position.y, (int)position.z))
+                {
+                    Vector3 finalPos = new Vector3(position.x, position.y, position.z);
+                    WorldManager.GetInstance().RemoveLoadedBlock((int)finalPos.x, (int)finalPos.y, (int)finalPos.z);
+                    break;
+                }
+
+                step += 0.3f;
+            }
         }
     }
 }
