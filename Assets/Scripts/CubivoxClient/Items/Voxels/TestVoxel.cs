@@ -5,7 +5,7 @@ namespace CubivoxClient.Items.Voxels
 {
     [Name("TestBlock")]
     [Key("TESTBLOCK")]
-    [Texture("ExampleBlock")]
+    [Texture("Textures/ExampleBlock")]
     public class TestVoxel : ModVoxel
     {
         public TestVoxel(Mod mod) : base(mod)

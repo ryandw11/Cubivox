@@ -1,9 +1,12 @@
 using CubivoxCore;
 using CubivoxCore.BaseGame;
+using CubivoxCore.BaseGame.VoxelDefs;
 using CubivoxCore.Mods;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using CubivoxRender;
 
 namespace CubivoxClient.BaseGame
 {
@@ -37,6 +40,19 @@ namespace CubivoxClient.BaseGame
         public void SetVoxelDef(VoxelDef voxelDef)
         {
             this.voxelDef = voxelDef;
+        }
+
+        public RenderVoxel GetRenderVoxel()
+        {
+            RenderVoxel renderVoxel = new RenderVoxel
+            {
+                xOffset = voxelDef.GetAtlasTexture()?.xOffset ?? 0,
+                yOffset = voxelDef.GetAtlasTexture()?.yOffset ?? 0,
+                rows = Cubivox.GetTextureAtlas().GetNumberOfRows(),
+                transparent = voxelDef.IsTransparent(),
+                empty = voxelDef is AirVoxel
+            };
+            return renderVoxel;
         }
     }
 }
