@@ -25,15 +25,25 @@ namespace CubivoxClient.Players
         /// </summary>
         public bool IsLocalPlayer = false;
 
+        private Rigidbody rigidbody;
+
         void Start()
         {
             ClientCubivox.GetClientInstance().GetPlayers().Add(this);
+
+            if(!IsLocalPlayer)
+            {
+                // Initalize the username billboard.
+                GetComponentInChildren<TextMesh>().text = Username;
+            }
 
             // Send the position packet 20 times per second.
             if(IsLocalPlayer)
             {
                 InvokeRepeating("SendPositionPacket", 1, 0.03f);
             }
+
+            rigidbody = GetComponent<Rigidbody>();
         }
 
 
@@ -77,7 +87,12 @@ namespace CubivoxClient.Players
 
         void Update()
         {
-            
+            if(!IsLocalPlayer)
+            {
+                // Update the Username billboard rotation.
+                transform.GetChild(0).transform.rotation = Camera.main.transform.rotation;
+                rigidbody.velocity = Vector3.zero;
+            }
         }
 
         private void SendPositionPacket() {

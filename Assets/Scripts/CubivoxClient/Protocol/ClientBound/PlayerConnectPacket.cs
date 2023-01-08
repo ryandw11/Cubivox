@@ -51,6 +51,8 @@ namespace CubivoxClient.Protocol.ClientBound
                 ClientPlayer clientPlayer = obj.GetComponent<ClientPlayer>();
                 clientPlayer.Username = username;
                 clientPlayer.Uuid = uuid;
+
+                Debug.Log($"[Networking] {username} has joined the game!");
             });
 
             return true;

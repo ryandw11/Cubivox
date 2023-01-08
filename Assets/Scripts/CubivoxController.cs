@@ -16,6 +16,7 @@ public class CubivoxController : MonoBehaviour
 {
 
     public GameObject playerPrefab;
+    public CubivoxScene cubivoxScene;
 
     private ClientCubivox clientCubivox;
 
@@ -26,13 +27,30 @@ public class CubivoxController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        instance = this;
-        Debug.Log("test");
-        this.clientCubivox = new ClientCubivox();
-        this.clientCubivox.OnEnable();
+        if(instance != null)
+        {
+            Debug.Log("Changing instances of the CubivoxController"); 
+        }
 
-        Debug.Log("Connecting to server!");
-        this.clientCubivox.ConnectToServer("localhost", 5555);
+        instance = this;
+
+        if (!ClientCubivox.HasInstance())
+        {
+            Debug.Log("Initalizing Client Cubivox...");
+            this.clientCubivox = new ClientCubivox(cubivoxScene);
+            this.clientCubivox.OnEnable();
+
+            // Connect to the server if starting off in the player scene.
+            if(cubivoxScene == CubivoxScene.PlayScene)
+            {
+                Debug.Log("Detected Debug Player, Connecting to default server...");
+                System.Random rand = new System.Random();
+                clientCubivox.ConnectToServer("localhost", 5555, $"Test{rand.Next(0, 100)}");
+            }
+        } else
+        {
+            clientCubivox = ClientCubivox.GetClientInstance();
+        }
     }
 
     // Update is called once per frame

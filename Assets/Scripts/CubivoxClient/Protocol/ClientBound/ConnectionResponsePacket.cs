@@ -25,7 +25,6 @@ namespace CubivoxClient.Protocol.ClientBound
             string jsonString = Encoding.ASCII.GetString(data);
             var jsonObj = JsonUtility.FromJson<ConnectionResponseData>(jsonString);
 
-            Debug.Log(jsonString);
             CubivoxController.RunOnMainThread(() =>
             {
                 GameObject[] objs = GameObject.FindGameObjectsWithTag("GameController");
@@ -48,7 +47,8 @@ namespace CubivoxClient.Protocol.ClientBound
                     clientPlayer.Uuid = Guid.Parse(player.Uuid);
                 }
 
-                controller.GetCubivox().CurrentState = GameState.PLAYING;
+                controller.GetCubivox().CurrentState = GameState.CONNECTED_LOADING;
+                Debug.Log($"[Networking] Connected to server with {jsonObj.Players.Length} players!");
             });
             return true;
         }

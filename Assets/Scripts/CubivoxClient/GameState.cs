@@ -2,8 +2,10 @@
 {
     public enum GameState
     {
-        NOT_CONNECTED,
+        TITLE_SCREEN,
         CONNECTING,
-        PLAYING
+        CONNECTED_LOADING,
+        PLAYING,
+        DISCONNECTED
     }
 }
