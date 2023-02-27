@@ -71,6 +71,11 @@ public class CubivoxController : MonoBehaviour
         }
     }
 
+    void OnApplicationQuit()
+    {
+        clientCubivox.OnApplicationQuit();
+    }
+
     public ClientCubivox GetCubivox()
     {
         return clientCubivox;

@@ -22,6 +22,8 @@ namespace CubivoxClient
     {
         public static readonly short PROTOCOL_VERSION = 0x0;
 
+        internal string DisconnectionReason { get; set; } = "";
+
         private List<ClientPlayer> players;
         private Dictionary<byte, ClientBoundPacket> packetList;
 
@@ -45,6 +47,7 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new PlayerConnectPacket());
             RegisterClientBoundPacket(new PlayerPositionUpdatePacket());
             RegisterClientBoundPacket(new PlayerDisconnectPacket());
+            RegisterClientBoundPacket(new DisconnectPacket());
         }
 
         public override EnvType GetEnvType()
@@ -75,6 +78,17 @@ namespace CubivoxClient
             return players;
         }
 
+        public void DisconnectClient(string reason)
+        {
+            DisconnectionReason = reason;
+
+            if (client != null)
+                client.Close();
+            client = null;
+
+            CurrentState = GameState.DISCONNECTED;
+        }
+
         public void SendPacketToServer(ServerBoundPacket packet)
         {
             if(client == null)
@@ -93,9 +107,17 @@ namespace CubivoxClient
 
         public void ConnectToServer(string ip, int port, string username)
         {
-            client = new TcpClient(ip, port);
-            CurrentState = GameState.CONNECTING;
-            SendPacketToServer(new ConnectPacket(username, Guid.NewGuid()));
+            try
+            {
+                client = new TcpClient(ip, port);
+                CurrentState = GameState.CONNECTING;
+                SendPacketToServer(new ConnectPacket(username, Guid.NewGuid()));
+            } catch (SocketException)
+            {
+                if(client != null) client.Close();
+                DisconnectionReason = $"Could not connect to host server {ip}:{port}.";
+                CurrentState = GameState.DISCONNECTED;
+            }
         }
 
         public void RegisterClientBoundPacket(ClientBoundPacket clientBoundPacket)
@@ -130,10 +152,8 @@ namespace CubivoxClient
                     } catch(IOException)
                     {
                         Debug.Log("[Networking] Disconnected from the game!");
-                        client.Close();
+                        DisconnectClient("Lost connection to host server.");
                         handlePacketsTask = null;
-                        CurrentState = GameState.DISCONNECTED;
-                        client = null;
                     }
                 }
             }
@@ -154,6 +174,13 @@ namespace CubivoxClient
                     }
                 }
             }
+        }
+
+        public void OnApplicationQuit()
+        {
+            if(client != null)
+                client.Close();
+            client = null;
         }
 
         public bool IsInNetworkingGameState()

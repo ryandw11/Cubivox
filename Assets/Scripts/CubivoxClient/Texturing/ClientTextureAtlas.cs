@@ -124,6 +124,13 @@ namespace CubivoxClient.Texturing
             int w = textureWidth * numOfRows;
             int h = textureHeight * numOfRows;
 
+            // If there are no textures in the texture atlas.
+            if(w == 0 || h == 0)
+            {
+                texture = new Texture2D(1, 1);
+                return;
+            }
+
             List<Texture2D> texData = new List<Texture2D>();
             textures.ForEach(text => {
                 Texture2D realText = Resources.Load<Texture2D>(text.location);

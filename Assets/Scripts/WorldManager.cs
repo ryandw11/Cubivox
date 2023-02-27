@@ -115,6 +115,7 @@ public class WorldManager : MonoBehaviour
                 for (int z = -10; z < 10; z++)
                 {
                     GameObject gameObject = new GameObject($"Chunk{{{x}, {y}, {z}}}");
+                    gameObject.tag = "Ground";
                     gameObject.transform.position = new Vector3(x * 16, y * 16, z * 16);
                     MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
                     MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
