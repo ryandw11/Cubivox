@@ -73,6 +73,11 @@ namespace CubivoxClient
             return instance != null;
         }
 
+        public ClientItemRegistry GetClientItemRegistry()
+        {
+            return (ClientItemRegistry) itemRegistry;
+        }
+
         public List<ClientPlayer> GetPlayers()
         {
             return players;

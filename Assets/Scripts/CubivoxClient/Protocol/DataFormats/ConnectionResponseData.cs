@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace CubivoxClient.Protocol.DataFormats
 {
@@ -6,7 +7,7 @@ namespace CubivoxClient.Protocol.DataFormats
     public class ConnectionResponseData
     {
         public string ServerName;
-        public string[] Voxels;
+        public Dictionary<string, string> VoxelMap;
         public PlayerData[] Players;
 
         [Serializable]

@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using CubivoxCore.BaseGame;
@@ -9,6 +10,7 @@ using CubivoxRender;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using CubivoxCore.BaseGame.VoxelDefs;
 
 namespace CubivoxClient.BaseGame
 {
@@ -16,7 +18,10 @@ namespace CubivoxClient.BaseGame
     {
         public static readonly int CHUNK_SIZE = 16;
 
-        private ClientVoxel[,,] voxels = new ClientVoxel[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
+        private byte[,,] voxels = new byte[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
+        private Dictionary<byte, short> voxelMap = new Dictionary<byte, short>();
+        private byte currentVoxelIndex = 0;
+
         private JobHandle jobHandle;
         RenderChunkJob.MeshOutput meshOutput;
         NativeArray<RenderVoxel> voxs;
@@ -32,7 +37,9 @@ namespace CubivoxClient.BaseGame
 
         public Voxel GetVoxel(int x, int y, int z)
         {
-            return voxels[Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z)];
+            byte id = voxels[Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z)];
+            
+            return ByteToVoxel(id, new Location(GetWorld(), x, y, z));
         }
 
         public World GetWorld()
@@ -54,20 +61,40 @@ namespace CubivoxClient.BaseGame
 
         public void SetVoxel(int x, int y, int z, VoxelDef voxelDef)
         {
-            voxels[Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z)].SetVoxelDef(voxelDef);
+            SetLocalVoxel(Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z), voxelDef);
+        }
+
+        public void SetLocalVoxel(int x, int y, int z, VoxelDef voxelDef)
+        {
+            short voxelId = ClientCubivox.GetClientInstance().GetClientItemRegistry().GetVoxelDefId(voxelDef);
+            if(voxelMap.ContainsValue(voxelId))
+            {
+                byte key = voxelMap.First(pair => pair.Value == voxelId).Key;
+                voxels[x, y, z] = key;
+            }
+            else
+            {
+                voxelMap[currentVoxelIndex] = voxelId;
+                currentVoxelIndex++;
+            }
         }
 
         // Use this for initialization
         void Start()
         {
-            if(Mathf.FloorToInt(transform.position.y / CHUNK_SIZE) != 2)
+            // TODO:: REMOVE THIS SECTION
+            SetLocalVoxel(0, 0, 0, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR")));
+            SetLocalVoxel(0, 0, 0, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK")));
+            // END TODO
+
+            if (Mathf.FloorToInt(transform.position.y / CHUNK_SIZE) != 2)
             {
                 if((int)(transform.position.y / CHUNK_SIZE) < 2)
                 {
-                    voxels = WorldManager.defaultVoxels;
+                    MemoryUtils.Fill3DArray<byte>(ref voxels, 1, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
                 } else
                 {
-                    voxels = WorldManager.defaultVoxelsAir;
+                    MemoryUtils.Fill3DArray<byte>(ref voxels, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
                 }
             } else
             {
@@ -80,11 +107,11 @@ namespace CubivoxClient.BaseGame
                         {
                             if (y < height)
                             {
-                                voxels[x, y, z] = new ClientVoxel(new Location(x, y, z), (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK")));
+                                SetLocalVoxel(x, y, z, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK")));
                             }
                             else
                             {
-                                voxels[x, y, z] = new ClientVoxel(new Location(x, y, z), (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR")));
+                                SetLocalVoxel(x, y, z, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR")));
                             }
                         }
                     }
@@ -137,7 +164,7 @@ namespace CubivoxClient.BaseGame
                 {
                     for (int z = 0; z < CHUNK_SIZE; z++)
                     {
-                        voxs[XYZToI(x, y, z)] = voxels[x, y, z].GetRenderVoxel();
+                        voxs[XYZToI(x, y, z)] = CreateRenderVoxel(GetVoxelDef(voxels[x, y, z]));
                     }
                 }
             }
@@ -192,6 +219,33 @@ namespace CubivoxClient.BaseGame
         private int XYZToI(int x, int y, int z)
         {
             return x + (z * CHUNK_SIZE) + (y * CHUNK_SIZE * CHUNK_SIZE);
+        }
+
+        private VoxelDef GetVoxelDef(byte b)
+        {
+            return ClientCubivox.GetClientInstance().GetClientItemRegistry().GetVoxelDef(voxelMap[b]);
+        }
+
+        private Voxel ByteToVoxel(byte b, Location location)
+        {
+            VoxelDef definition = ClientCubivox.GetClientInstance().GetClientItemRegistry().GetVoxelDef(voxelMap[b]);
+            ClientVoxel clientVoxel = new ClientVoxel(location, definition);
+
+            return clientVoxel;
+        }
+
+        // TODO :: REMOVE THIS
+        private RenderVoxel CreateRenderVoxel(VoxelDef def)
+        {
+            RenderVoxel renderVoxel = new RenderVoxel
+            {
+                xOffset = def.GetAtlasTexture()?.xOffset ?? 0,
+                yOffset = def.GetAtlasTexture()?.yOffset ?? 0,
+                rows = Cubivox.GetTextureAtlas().GetNumberOfRows(),
+                transparent = def.IsTransparent(),
+                empty = def is AirVoxel
+            };
+            return renderVoxel;
         }
 
     }
