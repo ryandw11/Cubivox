@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cubivox.Renderobjects;
+//using Cubivox.Renderobjects;
 
 /// <summary>
 /// This class is a Mock of the Player class and is temporary for testing systems.
@@ -9,7 +9,7 @@ using Cubivox.Renderobjects;
 public class PlayerMock : MonoBehaviour
 {
     // Start is called before the first frame update
-    void Start()
+    /*void Start()
     {
 
     }
@@ -55,7 +55,8 @@ public class PlayerMock : MonoBehaviour
                 RenderBlock block = renderChunk.GetOctChunk()[posX, posY, posZ];
                 renderChunk.RemoveBlock(block);
                 renderChunk.RegenerateChunkObject(WorldManager.GetInstance().GetTextureAtlas());
-            }*/
+            }
+    // * /
         }
 
         if (Input.GetKeyUp(KeyCode.Mouse1))
@@ -77,5 +78,5 @@ public class PlayerMock : MonoBehaviour
                 step += 0.3f;
             }
         }
-    }
+    }*/
 }
