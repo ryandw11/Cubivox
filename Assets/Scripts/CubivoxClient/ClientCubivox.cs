@@ -48,6 +48,8 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new PlayerPositionUpdatePacket());
             RegisterClientBoundPacket(new PlayerDisconnectPacket());
             RegisterClientBoundPacket(new DisconnectPacket());
+            RegisterClientBoundPacket(new CBBreakVoxelPacket());
+            RegisterClientBoundPacket(new CBPlaceVoxelPacket());
         }
 
         public override EnvType GetEnvType()

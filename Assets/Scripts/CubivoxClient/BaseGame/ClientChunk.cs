@@ -5,6 +5,7 @@ using UnityEngine;
 using CubivoxCore.BaseGame;
 using CubivoxCore;
 using CubivoxCore.Worlds;
+using CubivoxCore.Utils;
 using CubivoxRender;
 
 using Unity.Collections;
@@ -37,7 +38,7 @@ namespace CubivoxClient.BaseGame
 
         public Voxel GetVoxel(int x, int y, int z)
         {
-            byte id = voxels[Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z)];
+            byte id = voxels[CMath.mod(x, CHUNK_SIZE), CMath.mod(y, CHUNK_SIZE), CMath.mod(z, CHUNK_SIZE)];
             
             return ByteToVoxel(id, new Location(GetWorld(), x, y, z));
         }
@@ -61,7 +62,7 @@ namespace CubivoxClient.BaseGame
 
         public void SetVoxel(int x, int y, int z, VoxelDef voxelDef)
         {
-            SetLocalVoxel(Mathf.FloorToInt(x - transform.position.x), Mathf.FloorToInt(y - transform.position.y), Mathf.FloorToInt(z - transform.position.z), voxelDef);
+            SetLocalVoxel(CMath.mod(x, CHUNK_SIZE), CMath.mod(y, CHUNK_SIZE), CMath.mod(z, CHUNK_SIZE), voxelDef);
         }
 
         public void SetLocalVoxel(int x, int y, int z, VoxelDef voxelDef)

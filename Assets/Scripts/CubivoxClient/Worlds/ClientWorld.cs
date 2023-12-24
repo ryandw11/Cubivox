@@ -49,9 +49,9 @@ namespace CubivoxClient.Worlds
 
         public Voxel GetVoxel(int x, int y, int z)
         {
-            int chunkX = Mathf.FloorToInt(x / ClientChunk.CHUNK_SIZE);
-            int chunkY = Mathf.FloorToInt(y / ClientChunk.CHUNK_SIZE);
-            int chunkZ = Mathf.FloorToInt(z / ClientChunk.CHUNK_SIZE);
+            int chunkX = Mathf.FloorToInt((float) x / ClientChunk.CHUNK_SIZE);
+            int chunkY = Mathf.FloorToInt((float) y / ClientChunk.CHUNK_SIZE);
+            int chunkZ = Mathf.FloorToInt((float) z / ClientChunk.CHUNK_SIZE);
 
             Chunk chunk = GetChunk(chunkX, chunkY, chunkZ);
 
@@ -125,7 +125,20 @@ namespace CubivoxClient.Worlds
 
         public void SetVoxel(int x, int y, int z, VoxelDef voxel)
         {
-            GetVoxel(x, y, z).SetVoxelDef(voxel);
+            int chunkX = Mathf.FloorToInt((float) x / ClientChunk.CHUNK_SIZE);
+            int chunkY = Mathf.FloorToInt((float) y / ClientChunk.CHUNK_SIZE);
+            int chunkZ = Mathf.FloorToInt((float) z / ClientChunk.CHUNK_SIZE);
+
+            ClientChunk chunk = (ClientChunk) GetChunk(chunkX, chunkY, chunkZ);
+
+            if (chunk == null)
+            {
+                Debug.LogWarning("Tried to set a Voxel when the chunk was not loaded!");
+                return;
+            }
+
+            chunk.SetVoxel(x, y, z, voxel);
+            chunk.UpdateChunk();
         }
 
         public void UnloadChunk(int x, int y, int z)

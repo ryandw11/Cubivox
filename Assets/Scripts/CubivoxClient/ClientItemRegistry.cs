@@ -59,5 +59,10 @@ namespace CubivoxClient
         {
             return reverseVoxelMap[voxelDef];
         }
+
+        public VoxelDef GetVoxelDefinition(ControllerKey key)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }
