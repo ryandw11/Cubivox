@@ -50,6 +50,7 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new DisconnectPacket());
             RegisterClientBoundPacket(new CBBreakVoxelPacket());
             RegisterClientBoundPacket(new CBPlaceVoxelPacket());
+            RegisterClientBoundPacket(new CBLoadChunkPacket());
         }
 
         public override EnvType GetEnvType()
@@ -156,8 +157,9 @@ namespace CubivoxClient
                     {
                         await handlePacketsTask;
                         handlePacketsTask = ReadPackets();
-                    } catch(IOException)
+                    } catch(IOException ex)
                     {
+                        Debug.Log(ex.Message);
                         Debug.Log("[Networking] Disconnected from the game!");
                         DisconnectClient("Lost connection to host server.");
                         handlePacketsTask = null;

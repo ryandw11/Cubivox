@@ -80,49 +80,17 @@ namespace CubivoxClient.BaseGame
             }
         }
 
+        public void PopulateChunk(byte[,,] voxels, Dictionary<byte, short> voxelMap, byte currentVoxelIndex)
+        {
+            this.voxels = voxels;
+            this.voxelMap = voxelMap;
+            this.currentVoxelIndex = currentVoxelIndex;
+        }
+
         // Use this for initialization
         void Start()
         {
-            // TODO:: REMOVE THIS SECTION
-            SetLocalVoxel(0, 0, 0, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR")));
-            SetLocalVoxel(0, 0, 0, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK")));
-            // END TODO
-
-            if (Mathf.FloorToInt(transform.position.y / CHUNK_SIZE) != 2)
-            {
-                if((int)(transform.position.y / CHUNK_SIZE) < 2)
-                {
-                    MemoryUtils.Fill3DArray<byte>(ref voxels, 1, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-                } else
-                {
-                    MemoryUtils.Fill3DArray<byte>(ref voxels, 0, CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE);
-                }
-            } else
-            {
-                for (int x = 0; x < CHUNK_SIZE; x++)
-                {
-                    for (int z = 0; z < CHUNK_SIZE; z++)
-                    {
-                        double height = Mathf.PerlinNoise((transform.position.x + x) / 100, (transform.position.z + z) / 100) * 16;
-                        for (int y = 0; y < CHUNK_SIZE; y++)
-                        {
-                            if (y < height)
-                            {
-                                SetLocalVoxel(x, y, z, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK")));
-                            }
-                            else
-                            {
-                                SetLocalVoxel(x, y, z, (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR")));
-                            }
-                        }
-                    }
-                }
-                    
-            }
-
-            WorldManager.GetInstance().GetCurrentWorld().AddLoadedChunk(this);
-
-            UpdateChunk();
+            
         }
 
         // Update is called once per frame

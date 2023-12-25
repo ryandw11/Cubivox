@@ -18,4 +18,25 @@ public static class MemoryUtils
             }
         }
     }
+
+    public static T[,,] OneDArrayTo3DArray<T>(ref T[] array, int componentLength) where T : unmanaged
+    {
+        int totalLength = componentLength * componentLength * componentLength;
+        T[,,] result = new T[componentLength, componentLength, componentLength];
+        unsafe
+        {
+            fixed (T* start = &array[0])
+            {
+                T* current = start;
+                var span = new Span<T>(current, totalLength);
+                fixed (T* resultStart = &result[0, 0, 0])
+                {
+                    T* resultCurrent = resultStart;
+                    var resultSpan = new Span<T>(resultCurrent, totalLength);
+                    span.CopyTo(resultSpan);
+                }
+            }
+        }
+        return result;
+    }
 }

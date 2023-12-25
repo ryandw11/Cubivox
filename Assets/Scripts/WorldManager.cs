@@ -103,7 +103,7 @@ public class WorldManager : MonoBehaviour
 
         // TODO :: Don't hard code this in the future.
 
-        StartCoroutine(Generate());
+        //StartCoroutine(Generate());
     }
 
     IEnumerator Generate()
@@ -127,7 +127,7 @@ public class WorldManager : MonoBehaviour
             }
         }
 
-        //handleChunkLoading.Start();
+        handleChunkLoading.Start();
     }
 
     void LoadChunk(Location position)
