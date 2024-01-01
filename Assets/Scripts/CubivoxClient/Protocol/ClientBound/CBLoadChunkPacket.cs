@@ -17,36 +17,29 @@ namespace CubivoxClient.Protocol.ClientBound
         public bool ProcessPacket(ClientCubivox clientCubivox, NetworkStream stream)
         {
             byte[] locBuffer = new byte[4];
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int x = BitConverter.ToInt32(locBuffer);
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int y = BitConverter.ToInt32(locBuffer);
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int z = BitConverter.ToInt32(locBuffer);
 
             byte[] voxelMapBuffer = new byte[2];
-            if (stream.Read(voxelMapBuffer, 0, 2) != 2)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(voxelMapBuffer, stream);
 
             Dictionary<byte, short> voxelMap = new Dictionary<byte, short>();
             short voxelMapSize = BitConverter.ToInt16(voxelMapBuffer);
             for(int i = 0; i < voxelMapSize; i++)
             {
-                if (stream.Read(voxelMapBuffer, 0, 2) != 2)
-                    return false;
+                NetworkingUtils.FillBufferFromNetwork(voxelMapBuffer, stream);
                 voxelMap.Add((byte) i, BitConverter.ToInt16(voxelMapBuffer));
             }
 
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int voxelBufferSize = BitConverter.ToInt32(locBuffer);
 
             byte[] voxelBuffer = new byte[voxelBufferSize];
-            if (stream.Read(voxelBuffer, 0, voxelBufferSize) != voxelBufferSize)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(voxelBuffer, stream);
             voxelBuffer = Decompress(voxelBuffer);
             byte[,,] voxels = MemoryUtils.OneDArrayTo3DArray(ref voxelBuffer, ClientChunk.CHUNK_SIZE);
 
@@ -84,6 +77,12 @@ namespace CubivoxClient.Protocol.ClientBound
         byte Packet.GetType()
         {
             return 0x08;
+        }
+
+        bool AssertProblem()
+        {
+            Debug.Assert(false);
+            return false;
         }
     }
 }

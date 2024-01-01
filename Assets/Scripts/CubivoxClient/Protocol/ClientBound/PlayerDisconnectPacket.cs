@@ -11,7 +11,7 @@ namespace CubivoxClient.Protocol.ClientBound
         public bool ProcessPacket(ClientCubivox clientCubivox, NetworkStream stream)
         {
             byte[] rawUuid = new byte[16];
-            if (stream.Read(rawUuid, 0, 16) != 16) return false;
+            NetworkingUtils.FillBufferFromNetwork(rawUuid, stream);
 
             Guid uuid = new Guid(rawUuid);
 

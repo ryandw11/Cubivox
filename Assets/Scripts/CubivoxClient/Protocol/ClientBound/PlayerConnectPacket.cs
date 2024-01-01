@@ -15,23 +15,18 @@ namespace CubivoxClient.Protocol.ClientBound
         public bool ProcessPacket(ClientCubivox clientCubivox, NetworkStream stream)
         {
             byte[] rawUsername = new byte[25];
-            if (stream.Read(rawUsername, 0, 25) != 25)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(rawUsername, stream);
             string username = Encoding.ASCII.GetString(rawUsername);
             byte[] rawUuid = new byte[16];
-            if (stream.Read(rawUuid, 0, 16) != 16)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(rawUuid, stream);
             Guid uuid = new Guid(rawUuid);
 
             byte[] locBuffer = new byte[8];
-            if (stream.Read(locBuffer, 0, 8) != 8) 
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             double x = BitConverter.ToDouble(locBuffer);
-            if (stream.Read(locBuffer, 0, 8) != 8)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             double y = BitConverter.ToDouble(locBuffer);
-            if (stream.Read(locBuffer, 0, 8) != 8)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             double z = BitConverter.ToDouble(locBuffer);
 
             CubivoxController.RunOnMainThread(() =>

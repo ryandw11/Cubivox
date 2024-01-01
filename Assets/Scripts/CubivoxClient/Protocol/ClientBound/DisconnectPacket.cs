@@ -18,7 +18,7 @@ namespace CubivoxClient.Protocol.ClientBound
 
             // TODO :: Add a limited length.
             byte[] rawReason = new byte[reasonLength];
-            if (stream.Read(rawReason, 0, reasonLength) != reasonLength) return false;
+            NetworkingUtils.FillBufferFromNetwork(rawReason, stream);
 
             string reason = Encoding.ASCII.GetString(rawReason);
 

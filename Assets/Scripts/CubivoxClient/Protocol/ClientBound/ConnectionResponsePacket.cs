@@ -21,7 +21,7 @@ namespace CubivoxClient.Protocol.ClientBound
             int dataSize = BitConverter.ToInt32(rawDataSize);
 
             byte[] data = new byte[dataSize];
-            if (stream.Read(data, 0, dataSize) != dataSize) return false;
+            NetworkingUtils.FillBufferFromNetwork(data, stream);
             string jsonString = Encoding.ASCII.GetString(data);
             var jsonObj = JsonUtility.FromJson<ConnectionResponseData>(jsonString);
 

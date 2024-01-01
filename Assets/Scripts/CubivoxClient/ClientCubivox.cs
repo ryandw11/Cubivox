@@ -138,7 +138,8 @@ namespace CubivoxClient
                 client = new TcpClient(ip, port);
                 CurrentState = GameState.CONNECTING;
                 SendPacketToServer(new ConnectPacket(username, Guid.NewGuid()));
-            } catch (SocketException)
+            } 
+            catch (SocketException)
             {
                 if(client != null) client.Close();
                 DisconnectionReason = $"Could not connect to host server {ip}:{port}.";
@@ -169,7 +170,7 @@ namespace CubivoxClient
             {
                 if (handlePacketsThread == null)
                 {
-                    handlePacketsThread = new Thread(async () =>
+                    handlePacketsThread = new Thread(() =>
                     {
                         while (true)
                         {
@@ -177,9 +178,9 @@ namespace CubivoxClient
                             {
                                 try
                                 {
-                                    await ReadPackets();
+                                    ReadPackets();
                                 }
-                                catch (IOException e)
+                                catch (IOException)
                                 {
                                     Debug.Log("[Networking] Disconnected from the game!");
                                     DisconnectClient("Lost connection to host server.");
@@ -226,17 +227,18 @@ namespace CubivoxClient
             return CurrentState == GameState.CONNECTING || CurrentState == GameState.CONNECTED_LOADING || CurrentState == GameState.PLAYING;
         }
 
-        private async Task ReadPackets()
+        private void ReadPackets()
         {
             NetworkStream stream = client.GetStream();
             byte[] id = new byte[1];
-            if(await stream.ReadAsync(id, 0, 1) != 1)
+            if(stream.Read(id, 0, 1) != 1)
             {
                 Debug.LogWarning("[Networking] Error: Could not read byte from NetworkStream!");
                 return;
             }
             try
             {
+                //Debug.Log("Reading Packet: " + packetList[id[0]]);
                 if (!packetList[id[0]].ProcessPacket(this, stream))
                 {
                     Debug.LogWarning($"[Networking] Error: Invalid packet recived from Server! Packet Id: {(int)id[0]}");
@@ -248,9 +250,24 @@ namespace CubivoxClient
                         stream.Read(buffer, 0, buffer.Length);
                     }
                 }
-            } catch(KeyNotFoundException)
+                //Debug.Log("Done Reading Packet");
+            } 
+            catch(KeyNotFoundException ex)
             {
                 Debug.LogWarning($"[Networking] Error: No packet with id {(int)id[0]} exists!");
+                Debug.LogWarning("[Networking] Clearing out the network stream.");
+                // Clear out the network stream.
+                byte[] buffer = new byte[4096];
+                while (stream.DataAvailable)
+                {
+                    stream.Read(buffer, 0, buffer.Length);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.Log(ex.ToString());
+                Debug.LogError("[Networking | ERROR] Unable to process packets from server, disconnecting...");
+                DisconnectClient("Invalid response recieved from server.");
             }
         }
     }

@@ -11,14 +11,11 @@ namespace CubivoxClient.Protocol.ClientBound
         public bool ProcessPacket(ClientCubivox clientCubivox, NetworkStream stream)
         {
             byte[] locBuffer = new byte[4];
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int x = BitConverter.ToInt32(locBuffer);
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int y = BitConverter.ToInt32(locBuffer);
-            if (stream.Read(locBuffer, 0, 4) != 4)
-                return false;
+            NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int z = BitConverter.ToInt32(locBuffer);
 
             CubivoxController.RunOnMainThread(() => {
