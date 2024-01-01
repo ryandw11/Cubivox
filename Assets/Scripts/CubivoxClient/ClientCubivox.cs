@@ -15,6 +15,7 @@ using CubivoxClient.Protocol;
 using CubivoxClient.Protocol.ServerBound;
 using CubivoxClient.Protocol.ClientBound;
 using System.IO;
+using System.Threading;
 
 namespace CubivoxClient
 {
@@ -28,7 +29,8 @@ namespace CubivoxClient
         private Dictionary<byte, ClientBoundPacket> packetList;
 
         private TcpClient? client;
-        private Task handlePacketsTask;
+        private Thread handlePacketsThread;
+        private Thread mainThread;
 
         public GameState CurrentState { get; internal set; }
 
@@ -51,6 +53,8 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new CBBreakVoxelPacket());
             RegisterClientBoundPacket(new CBPlaceVoxelPacket());
             RegisterClientBoundPacket(new CBLoadChunkPacket());
+
+            mainThread = Thread.CurrentThread;
         }
 
         public override EnvType GetEnvType()
@@ -86,10 +90,24 @@ namespace CubivoxClient
             return players;
         }
 
+        /// <summary>
+        /// Disconnect the client from the server with a specific reason. This will close the TCP connection to the server.
+        /// This is a thread-safe action and can be called from any thread. (It may not trigger immediatley if not called on the main thread).
+        /// </summary>
+        /// <param name="reason">The reason fo the disconnect.</param>
         public void DisconnectClient(string reason)
         {
+            if (Thread.CurrentThread != mainThread)
+            {
+                CubivoxController.RunOnMainThread(() =>
+                {
+                    DisconnectClient(reason);
+                });
+                return;
+            }
             DisconnectionReason = reason;
 
+            handlePacketsThread.Abort();
             if (client != null)
                 client.Close();
             client = null;
@@ -126,6 +144,9 @@ namespace CubivoxClient
                 DisconnectionReason = $"Could not connect to host server {ip}:{port}.";
                 CurrentState = GameState.DISCONNECTED;
             }
+
+            // Handle The Async Reading of Packets:
+            StartListeningForPackets();
         }
 
         public void RegisterClientBoundPacket(ClientBoundPacket clientBoundPacket)
@@ -142,30 +163,37 @@ namespace CubivoxClient
             players.Remove(clientPlayer);
         }
 
-        public async void Update()
+        internal void StartListeningForPackets()
         {
             if (client != null && IsInNetworkingGameState())
             {
-                if (handlePacketsTask == null)
+                if (handlePacketsThread == null)
                 {
-                    handlePacketsTask = ReadPackets();
-                }
-
-                if (handlePacketsTask.IsCompleted)
-                {
-                    try
+                    handlePacketsThread = new Thread(async () =>
                     {
-                        await handlePacketsTask;
-                        handlePacketsTask = ReadPackets();
-                    } catch(IOException ex)
-                    {
-                        Debug.Log(ex.Message);
-                        Debug.Log("[Networking] Disconnected from the game!");
-                        DisconnectClient("Lost connection to host server.");
-                        handlePacketsTask = null;
-                    }
+                        while (true)
+                        {
+                            if ( client.GetStream().DataAvailable )
+                            {
+                                try
+                                {
+                                    await ReadPackets();
+                                }
+                                catch (IOException e)
+                                {
+                                    Debug.Log("[Networking] Disconnected from the game!");
+                                    DisconnectClient("Lost connection to host server.");
+                                }
+                            }
+                        }
+                    });
+                    handlePacketsThread.Start();
                 }
             }
+        }
+
+        public async void Update()
+        {
 
             if(CurrentState == GameState.CONNECTED_LOADING)
             {
@@ -187,7 +215,8 @@ namespace CubivoxClient
 
         public void OnApplicationQuit()
         {
-            if(client != null)
+            handlePacketsThread.Abort();
+            if (client != null)
                 client.Close();
             client = null;
         }
@@ -208,8 +237,17 @@ namespace CubivoxClient
             }
             try
             {
-                if(!packetList[id[0]].ProcessPacket(this, stream))
+                if (!packetList[id[0]].ProcessPacket(this, stream))
+                {
                     Debug.LogWarning($"[Networking] Error: Invalid packet recived from Server! Packet Id: {(int)id[0]}");
+                    Debug.LogWarning("[Networking] Clearing out the network stream.");
+                    // Clear out the network stream.
+                    byte[] buffer = new byte[4096];
+                    while(stream.DataAvailable)
+                    {
+                        stream.Read(buffer, 0, buffer.Length);
+                    }
+                }
             } catch(KeyNotFoundException)
             {
                 Debug.LogWarning($"[Networking] Error: No packet with id {(int)id[0]} exists!");
