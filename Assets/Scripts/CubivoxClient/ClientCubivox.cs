@@ -270,5 +270,14 @@ namespace CubivoxClient
                 DisconnectClient("Invalid response recieved from server.");
             }
         }
+
+        public override void AssertServer()
+        {
+            throw new Exception();
+        }
+
+        public override void AssertClient()
+        {
+        }
     }
 }

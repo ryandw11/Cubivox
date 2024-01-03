@@ -14,6 +14,7 @@ using CubivoxClient;
 using UnityEngine;
 using System.Runtime.CompilerServices;
 using CubivoxClient.Texturing;
+using CubivoxCore.Worlds.Generation;
 
 namespace CubivoxClient.Worlds
 {
@@ -154,6 +155,11 @@ namespace CubivoxClient.Worlds
         public ConcurrentDictionary<Location, ClientChunk> GetLoadedChunks()
         {
             return loadedChunks;
+        }
+
+        public WorldGenerator GetGenerator()
+        {
+            throw new InvalidEnvironmentException("Generators only exist on the server.");
         }
     }
 }

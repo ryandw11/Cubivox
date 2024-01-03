@@ -106,5 +106,23 @@ namespace CubivoxClient.Players
                 transform.hasChanged = false;
             }
         }
+
+        public void Kick(string reason)
+        {
+            if(!IsLocalPlayer)
+            {
+                throw new InvalidEnvironmentException("Only the local player can be kicked from the client.");
+            }
+            ClientCubivox.GetClientInstance().DisconnectClient(reason);
+        }
+
+        public void SetLocation(Location location)
+        {
+            if (!IsLocalPlayer)
+            {
+                throw new InvalidEnvironmentException("Only the local player's position can be modified.");
+            }
+            transform.position = LocationUtils.LocationToVector(location);
+        }
     }
 }
