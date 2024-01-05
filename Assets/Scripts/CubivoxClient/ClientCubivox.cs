@@ -53,6 +53,7 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new CBBreakVoxelPacket());
             RegisterClientBoundPacket(new CBPlaceVoxelPacket());
             RegisterClientBoundPacket(new CBLoadChunkPacket());
+            RegisterClientBoundPacket(new CBChatMessagePacket());
 
             mainThread = Thread.CurrentThread;
         }
