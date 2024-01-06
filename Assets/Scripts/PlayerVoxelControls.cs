@@ -42,7 +42,7 @@ public class PlayerVoxelControls : MonoBehaviour
 
                 if (voxel != null && voxel.GetVoxelDef() != air)
                 {
-                    clientCubivox.SendPacketToServer(new PlaceVoxelPacket(air, LocationUtils.VectorToLocation(position)));
+                    clientCubivox.SendPacketToServer(new BreakVoxelPacket(LocationUtils.VectorToLocation(position)));
                     break;
                 }
 
