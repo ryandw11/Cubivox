@@ -16,6 +16,9 @@ using CubivoxClient.Protocol.ServerBound;
 using CubivoxClient.Protocol.ClientBound;
 using System.IO;
 using System.Threading;
+using CubivoxClient.Loggers;
+using CubivoxCore.BaseGame;
+using CubivoxCore.Worlds.Generation;
 
 namespace CubivoxClient
 {
@@ -25,8 +28,11 @@ namespace CubivoxClient
 
         internal string DisconnectionReason { get; set; } = "";
 
+        private bool enabled = false;
         private List<ClientPlayer> players;
         private Dictionary<byte, ClientBoundPacket> packetList;
+
+        private ClientLogger logger;
 
         private TcpClient? client;
         private Thread handlePacketsThread;
@@ -41,6 +47,8 @@ namespace CubivoxClient
             textureAtlas = new ClientTextureAtlas(new List<ClientAtlasTexture>(), "/tmp");
             players = new List<ClientPlayer>();
             packetList = new Dictionary<byte, ClientBoundPacket>();
+
+            logger = new ClientLogger("Cubivox");
 
             CurrentState = currentScene == CubivoxScene.TitleScene ? GameState.TITLE_SCREEN : GameState.DISCONNECTED;
 
@@ -63,12 +71,35 @@ namespace CubivoxClient
             return EnvType.CLIENT;
         }
 
-        public override void OnEnable()
+        public override CubivoxCore.Console.Logger GetLogger()
+        {
+            return logger;
+        }
+
+        public override void LoadItemsStage(ItemRegistry itemRegistry)
         {
             itemRegistry.RegisterItem(new AirVoxel());
+
+            // TODO: Modify RegisterItem to also register the texture.
             TestVoxel testVoxel = new TestVoxel(this);
-            itemRegistry.RegisterItem(testVoxel);
+            itemRegistry.RegisterItem(new TestVoxel(this));
             textureAtlas.RegisterTexture(testVoxel.GetAtlasTexture(), true);
+        }
+
+        public override void LoadGeneratorsStage(GeneratorRegistry generatorRegistry)
+        {
+            // The generator stage only ever triggers on the server.
+        }
+
+        public override void OnEnable()
+        {
+            if (enabled)
+            {
+                throw new Exception("Client Cubivox cannot be enabled twice.");
+            }
+            enabled = true;
+
+            LoadItemsStage(itemRegistry);
         }
 
         public static ClientCubivox GetClientInstance()
