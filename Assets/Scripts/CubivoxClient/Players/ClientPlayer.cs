@@ -9,6 +9,7 @@ using UnityEngine;
 using CubivoxCore;
 using CubivoxCore.BaseGame;
 using CubivoxCore.Commands;
+using CubivoxCore.Entities;
 using CubivoxCore.Players;
 using CubivoxCore.Exceptions;
 using CubivoxClient.Protocol.ServerBound;

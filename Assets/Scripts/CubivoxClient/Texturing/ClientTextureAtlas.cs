@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using UnityEngine;
+using CubivoxCore.Texturing;
 
-using CubivoxCore.BaseGame.Texturing;
+using UnityEngine;
 
 namespace CubivoxClient.Texturing
 {
@@ -133,7 +133,7 @@ namespace CubivoxClient.Texturing
 
             List<Texture2D> texData = new List<Texture2D>();
             textures.ForEach(text => {
-                Texture2D realText = Resources.Load<Texture2D>(text.location);
+                Texture2D realText = Resources.Load<Texture2D>(text.Location);
                 Texture2D cloneText = new Texture2D(realText.width, realText.height);
                 cloneText.SetPixels(realText.GetPixels());
                 cloneText.Apply();

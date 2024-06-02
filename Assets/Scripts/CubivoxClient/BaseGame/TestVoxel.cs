@@ -1,7 +1,8 @@
-﻿using CubivoxCore.Mods;
-using CubivoxCore.Attributes;
+﻿using CubivoxCore.Attributes;
+using CubivoxCore.Mods;
+using CubivoxCore.Voxels;
 
-namespace CubivoxClient.Items.Voxels
+namespace CubivoxClient.BaseGame
 {
     [Name("TestBlock")]
     [Key("TESTBLOCK")]

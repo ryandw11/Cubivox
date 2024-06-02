@@ -1,13 +1,11 @@
+using CubivoxCore;
+using CubivoxCore.Voxels;
+
 using CubivoxClient;
 using CubivoxClient.Protocol.ServerBound;
 using CubivoxClient.Worlds;
-using CubivoxCore;
-using CubivoxCore.BaseGame;
-using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+
 using UnityEngine;
-using UnityEngine.UIElements;
 
 public class PlayerVoxelControls : MonoBehaviour
 {

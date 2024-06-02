@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
-using CubivoxCore.BaseGame;
+
 using CubivoxCore;
-using CubivoxCore.Worlds;
+using CubivoxCore.BaseGame.VoxelDefs;
 using CubivoxCore.Utils;
+using CubivoxCore.Voxels;
+using CubivoxCore.Worlds;
+
+using CubivoxClient.Voxels;
+
 using CubivoxRender;
 
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
-using CubivoxCore.BaseGame.VoxelDefs;
+using UnityEngine;
 
-namespace CubivoxClient.BaseGame
+namespace CubivoxClient.Worlds
 {
     public class ClientChunk : MonoBehaviour, Chunk
     {
@@ -46,18 +50,6 @@ namespace CubivoxClient.BaseGame
         public World GetWorld()
         {
             return WorldManager.GetInstance().GetCurrentWorld();
-        }
-
-        public bool IsLoaded()
-        {
-            // Chunks are always loaded on the client.
-            return !hasJob;
-        }
-
-        public bool Load()
-        {
-            // The client does not have the ability to load chunks.
-            return true;
         }
 
         public void SetVoxel(int x, int y, int z, VoxelDef voxelDef)
@@ -208,8 +200,8 @@ namespace CubivoxClient.BaseGame
         {
             RenderVoxel renderVoxel = new RenderVoxel
             {
-                xOffset = def.GetAtlasTexture()?.xOffset ?? 0,
-                yOffset = def.GetAtlasTexture()?.yOffset ?? 0,
+                xOffset = def.GetAtlasTexture()?.XOffset ?? 0,
+                yOffset = def.GetAtlasTexture()?.YOffset ?? 0,
                 rows = Cubivox.GetTextureAtlas().GetNumberOfRows(),
                 transparent = def.IsTransparent(),
                 empty = def is AirVoxel

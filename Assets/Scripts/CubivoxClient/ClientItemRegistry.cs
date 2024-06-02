@@ -1,5 +1,6 @@
 ﻿using CubivoxCore;
-using CubivoxCore.BaseGame;
+using CubivoxCore.Items;
+using CubivoxCore.Voxels;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -62,7 +63,13 @@ namespace CubivoxClient
 
         public VoxelDef GetVoxelDefinition(ControllerKey key)
         {
-            throw new System.NotImplementedException();
+            Item item = itemDictionary[key];
+            if (item is VoxelDef)
+            {
+                return (VoxelDef) item;
+            }
+
+            return null;
         }
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Net.Sockets;
 
 using CubivoxCore;
-using CubivoxCore.BaseGame;
+using CubivoxCore.Voxels;
 
 namespace CubivoxClient.Protocol.ServerBound
 {

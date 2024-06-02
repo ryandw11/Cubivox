@@ -1,24 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Net;
+using System.IO;
 using System.Net.Sockets;
+using System.Threading;
 
-using CubivoxClient.Items.Voxels;
-using CubivoxClient.Texturing;
 using CubivoxCore;
 using CubivoxCore.BaseGame.VoxelDefs;
-using UnityEngine;
+using CubivoxCore.Items;
+using CubivoxCore.Worlds.Generation;
 
+using CubivoxClient.BaseGame;
+using CubivoxClient.Loggers;
 using CubivoxClient.Players;
 using CubivoxClient.Protocol;
 using CubivoxClient.Protocol.ServerBound;
 using CubivoxClient.Protocol.ClientBound;
-using System.IO;
-using System.Threading;
-using CubivoxClient.Loggers;
-using CubivoxCore.BaseGame;
-using CubivoxCore.Worlds.Generation;
+using CubivoxClient.Texturing;
+
+using UnityEngine;
 
 namespace CubivoxClient
 {

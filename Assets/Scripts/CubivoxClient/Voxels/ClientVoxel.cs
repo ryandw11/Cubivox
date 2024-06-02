@@ -1,14 +1,13 @@
 using CubivoxCore;
-using CubivoxCore.BaseGame;
 using CubivoxCore.BaseGame.VoxelDefs;
-using CubivoxCore.Mods;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+using CubivoxCore.Voxels;
+using CubivoxCore.Worlds;
+
+using CubivoxClient.Worlds;
 
 using CubivoxRender;
 
-namespace CubivoxClient.BaseGame
+namespace CubivoxClient.Voxels
 {
     public class ClientVoxel : Voxel
     {
@@ -46,8 +45,8 @@ namespace CubivoxClient.BaseGame
         {
             RenderVoxel renderVoxel = new RenderVoxel
             {
-                xOffset = voxelDef.GetAtlasTexture()?.xOffset ?? 0,
-                yOffset = voxelDef.GetAtlasTexture()?.yOffset ?? 0,
+                xOffset = voxelDef.GetAtlasTexture()?.XOffset ?? 0,
+                yOffset = voxelDef.GetAtlasTexture()?.YOffset ?? 0,
                 rows = Cubivox.GetTextureAtlas().GetNumberOfRows(),
                 transparent = voxelDef.IsTransparent(),
                 empty = voxelDef is AirVoxel

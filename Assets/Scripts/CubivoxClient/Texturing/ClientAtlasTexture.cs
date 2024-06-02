@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-using CubivoxCore.BaseGame.Texturing;
+using CubivoxCore.Texturing;
 
 namespace CubivoxClient.Texturing
 {
@@ -21,9 +21,9 @@ namespace CubivoxClient.Texturing
          */
         internal void Init(int id, float xOffset, float yOffset)
         {
-            this.id = id;
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
+            Id = id;
+            XOffset = xOffset;
+            YOffset = yOffset;
         }
     }
 }

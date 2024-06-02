@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Threading;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
+
 using CubivoxCore;
-using CubivoxCore.BaseGame;
 using CubivoxCore.Exceptions;
+using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
-using CubivoxClient.BaseGame;
-using CubivoxClient;
-using UnityEngine;
-using System.Runtime.CompilerServices;
-using CubivoxClient.Texturing;
 using CubivoxCore.Worlds.Generation;
+
+using CubivoxClient;
+using CubivoxClient.Texturing;
+
+using UnityEngine;
 
 namespace CubivoxClient.Worlds
 {
