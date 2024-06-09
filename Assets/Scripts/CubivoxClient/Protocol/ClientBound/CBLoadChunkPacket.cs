@@ -9,6 +9,7 @@ using System.IO;
 using System.Net.Sockets;
 
 using UnityEngine;
+using CubivoxCore.Worlds;
 
 namespace CubivoxClient.Protocol.ClientBound
 {
@@ -46,18 +47,30 @@ namespace CubivoxClient.Protocol.ClientBound
             CubivoxController.RunOnMainThread(() => {
                 ClientWorld world = WorldManager.GetInstance().GetCurrentWorld();
 
-                GameObject gameObject = new GameObject($"Chunk{{{x}, {y}, {z}}}");
-                gameObject.tag = "Ground";
-                gameObject.transform.position = new Vector3(x * ClientChunk.CHUNK_SIZE, y * ClientChunk.CHUNK_SIZE, z * ClientChunk.CHUNK_SIZE);
-                MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
-                MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-                MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-                meshRenderer.sharedMaterial = ((ClientTextureAtlas)Cubivox.GetTextureAtlas()).GetMaterial();
-                ClientChunk clientChunk = gameObject.AddComponent<ClientChunk>();
+                // Check if the chunk already exists, if so replace it.
+                Chunk existingChunk = world.GetChunk(x, y, z);
+                if (existingChunk != null)
+                {
+                    Cubivox.GetInstance().GetLogger().Debug($"Recieved regenerate request for chunk at {x}, {y}, {z}");
+                    ClientChunk clientChunk = (ClientChunk) existingChunk;
+                    clientChunk.PopulateChunk(voxels, voxelMap, (byte)voxelMapSize);
+                    clientChunk.UpdateChunk();
+                }
+                else
+                {
+                    GameObject gameObject = new GameObject($"Chunk{{{x}, {y}, {z}}}");
+                    gameObject.tag = "Ground";
+                    gameObject.transform.position = new Vector3(x * ClientChunk.CHUNK_SIZE, y * ClientChunk.CHUNK_SIZE, z * ClientChunk.CHUNK_SIZE);
+                    MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
+                    MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
+                    MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
+                    meshRenderer.sharedMaterial = ((ClientTextureAtlas)Cubivox.GetTextureAtlas()).GetMaterial();
+                    ClientChunk clientChunk = gameObject.AddComponent<ClientChunk>();
 
-                clientChunk.PopulateChunk(voxels, voxelMap, (byte)voxelMapSize);
-                world.AddLoadedChunk(clientChunk);
-                clientChunk.UpdateChunk();
+                    clientChunk.PopulateChunk(voxels, voxelMap, (byte)voxelMapSize);
+                    world.AddLoadedChunk(clientChunk);
+                    clientChunk.UpdateChunk();
+                }
             });
 
             return true;

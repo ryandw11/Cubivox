@@ -42,6 +42,7 @@ namespace CubivoxClient.Players
             if(IsLocalPlayer)
             {
                 InvokeRepeating("SendPositionPacket", 1, 0.03f);
+                ClientCubivox.GetClientInstance().LocalPlayer = this;
             }
 
             rigidbody = GetComponent<Rigidbody>();

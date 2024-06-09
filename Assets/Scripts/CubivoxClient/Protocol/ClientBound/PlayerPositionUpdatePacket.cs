@@ -26,6 +26,13 @@ namespace CubivoxClient.Protocol.ClientBound
             double z = BitConverter.ToDouble(locBuffer);
 
             CubivoxController.RunOnMainThread(() => {
+                if( clientCubivox.LocalPlayer.Uuid == uuid )
+                {
+                    // If the local player, move the position.
+                    clientCubivox.LocalPlayer.transform.position = new Vector3((float)x, (float)y, (float)z);
+                    return;
+                }
+
                 GameObject obj = GameObject.Find(uuid.ToString());
                 if(obj == null)
                 {

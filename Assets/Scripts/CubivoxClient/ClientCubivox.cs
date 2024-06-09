@@ -39,6 +39,24 @@ namespace CubivoxClient
 
         public GameState CurrentState { get; internal set; }
 
+        private Guid localPlayerUuid;
+
+        private ClientPlayer _localPlayer;
+        public ClientPlayer LocalPlayer
+        {
+            get { return _localPlayer; }
+            internal set
+            {
+                if( _localPlayer != null && value != null )
+                {
+                    throw new Exception("Cannot set the local place twice!");
+                }
+
+                _localPlayer = value;
+                _localPlayer.Uuid = localPlayerUuid;
+            }
+        }
+
         public ClientCubivox(CubivoxScene currentScene)
         {
             instance = this;
@@ -144,6 +162,7 @@ namespace CubivoxClient
             client = null;
 
             CurrentState = GameState.DISCONNECTED;
+            LocalPlayer = null;
         }
 
         public void SendPacketToServer(ServerBoundPacket packet)
@@ -168,7 +187,11 @@ namespace CubivoxClient
             {
                 client = new TcpClient(ip, port);
                 CurrentState = GameState.CONNECTING;
-                SendPacketToServer(new ConnectPacket(username, Guid.NewGuid()));
+
+                Guid guid = Guid.NewGuid();
+                SendPacketToServer(new ConnectPacket(username, guid));
+                // TODO: Come up with a better system here for handeling the UUID
+                localPlayerUuid = guid;
             } 
             catch (SocketException)
             {
