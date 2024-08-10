@@ -11,10 +11,9 @@ public class PlayerCapsuleMovement : MonoBehaviour
     [SerializeField, Range(0f, 2f)]
     public float speed = 0.5f;
     public float sensitivity = 10f;
-    public float jumpForce = 250;
+    public float jumpForce = 300;
 
     private Rigidbody rigidbody;
-    private float previousYValue;
 
     private ClientCubivox clientCubivox;
 
@@ -43,11 +42,12 @@ public class PlayerCapsuleMovement : MonoBehaviour
 
         rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(new Vector3(0, Input.GetAxis("Mouse X") * sensitivity, 0)));
         rigidbody.MovePosition(transform.position + (transform.forward * Input.GetAxis("Vertical") * speed) + (transform.right * Input.GetAxis("Horizontal") * speed));
-        if (Input.GetKeyDown("space") && (transform.position.y == previousYValue))
+        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
+        {
             rigidbody.AddForce(transform.up * jumpForce);
+        }
 
         Camera.main.transform.rotation = Camera.main.transform.rotation * Quaternion.Euler(new Vector3(-Input.GetAxis("Mouse Y") * sensitivity, 0, 0));
-        var locationBeforeEvent = LocationUtils.VectorToLocation(transform.position);
 
         PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(clientCubivox.LocalPlayer, LocationUtils.VectorToLocation(transform.position), LocationUtils.VectorToLocation(previousPosition));
         ClientCubivox.GetEventManager().TriggerEvent(playerMoveEvent);
@@ -61,7 +61,15 @@ public class PlayerCapsuleMovement : MonoBehaviour
         }
 
         // Note: The player's location can be modified by the event.
+    }
 
-        previousYValue = transform.position.y;
+    bool IsGrounded()
+    {
+        // TODO: Remove this check when flying can be done for debug purposes through a debug mod.
+#if UNITY_EDITOR
+        return true;
+#else
+        return Physics.Raycast(transform.position, Vector3.down, 1.1f);
+#endif
     }
 }
