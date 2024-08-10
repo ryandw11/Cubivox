@@ -4,6 +4,7 @@ using System.Linq;
 
 using CubivoxCore;
 using CubivoxCore.BaseGame.VoxelDefs;
+using CubivoxCore.Exceptions;
 using CubivoxCore.Utils;
 using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
@@ -70,6 +71,11 @@ namespace CubivoxClient.Worlds
                 voxelMap[currentVoxelIndex] = voxelId;
                 currentVoxelIndex++;
             }
+        }
+
+        public void Regenerate()
+        {
+            throw new InvalidEnvironmentException("Regenerating a Chunk can only be done on the server!");
         }
 
         public void PopulateChunk(byte[,,] voxels, Dictionary<byte, short> voxelMap, byte currentVoxelIndex)

@@ -1,12 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net.Sockets;
 using System.Threading;
 
 using CubivoxCore;
 using CubivoxCore.BaseGame.VoxelDefs;
+using CubivoxCore.Players;
 using CubivoxCore.Items;
+using CubivoxCore.Worlds;
 using CubivoxCore.Worlds.Generation;
 
 using CubivoxClient.BaseGame;
@@ -91,6 +95,16 @@ namespace CubivoxClient
         public override CubivoxCore.Console.Logger GetLogger()
         {
             return logger;
+        }
+
+        public override ReadOnlyCollection<Player> GetOnlinePlayersImpl()
+        {
+            return players.Cast<Player>().ToList().AsReadOnly();
+        }
+
+        public override ReadOnlyCollection<World> GetWorldsImpl()
+        {
+            throw new NotImplementedException("Worlds have not yet been implemented in the client!");
         }
 
         public override void LoadItemsStage(ItemRegistry itemRegistry)
