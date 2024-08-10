@@ -22,6 +22,7 @@ using CubivoxClient.Protocol.ClientBound;
 using CubivoxClient.Texturing;
 
 using UnityEngine;
+using CubivoxClient.Events;
 
 namespace CubivoxClient
 {
@@ -66,6 +67,7 @@ namespace CubivoxClient
             instance = this;
             itemRegistry = new ClientItemRegistry();
             textureAtlas = new ClientTextureAtlas(new List<ClientAtlasTexture>(), "/tmp");
+            eventManager = new ClientEventManager();
             players = new List<ClientPlayer>();
             packetList = new Dictionary<byte, ClientBoundPacket>();
 

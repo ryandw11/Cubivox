@@ -1,7 +1,10 @@
-using CubivoxClient;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+
+using CubivoxCore.Events.Global;
+
+using CubivoxClient;
 
 public class PlayerCapsuleMovement : MonoBehaviour
 {
@@ -36,12 +39,28 @@ public class PlayerCapsuleMovement : MonoBehaviour
             Cursor.lockState = CursorLockMode.None;
         }
 
+        var previousPosition = transform.position;
+
         rigidbody.MoveRotation(rigidbody.rotation * Quaternion.Euler(new Vector3(0, Input.GetAxis("Mouse X") * sensitivity, 0)));
         rigidbody.MovePosition(transform.position + (transform.forward * Input.GetAxis("Vertical") * speed) + (transform.right * Input.GetAxis("Horizontal") * speed));
         if (Input.GetKeyDown("space") && (transform.position.y == previousYValue))
             rigidbody.AddForce(transform.up * jumpForce);
 
         Camera.main.transform.rotation = Camera.main.transform.rotation * Quaternion.Euler(new Vector3(-Input.GetAxis("Mouse Y") * sensitivity, 0, 0));
+        var locationBeforeEvent = LocationUtils.VectorToLocation(transform.position);
+
+        PlayerMoveEvent playerMoveEvent = new PlayerMoveEvent(clientCubivox.LocalPlayer, LocationUtils.VectorToLocation(transform.position), LocationUtils.VectorToLocation(previousPosition));
+        ClientCubivox.GetEventManager().TriggerEvent(playerMoveEvent);
+
+        if ( playerMoveEvent.IsCanceled() )
+        {
+            // Reset position if the event fails.
+            transform.position = previousPosition;
+            // Zero out the velocity.
+            rigidbody.velocity = Vector3.zero;
+        }
+
+        // Note: The player's location can be modified by the event.
 
         previousYValue = transform.position.y;
     }

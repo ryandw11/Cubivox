@@ -10,6 +10,7 @@ using CubivoxCore;
 using CubivoxCore.BaseGame;
 using CubivoxCore.Commands;
 using CubivoxCore.Entities;
+using CubivoxCore.Events.Global;
 using CubivoxCore.Players;
 using CubivoxCore.Exceptions;
 using CubivoxClient.Protocol.ServerBound;
@@ -32,22 +33,33 @@ namespace CubivoxClient.Players
         {
             ClientCubivox.GetClientInstance().GetPlayers().Add(this);
 
-            if(!IsLocalPlayer)
+            if (!IsLocalPlayer)
             {
                 // Initalize the username billboard.
                 GetComponentInChildren<TextMesh>().text = Username;
+
+                PlayerJoinEvent playerJoinEvent = new PlayerJoinEvent(this);
+                Cubivox.GetEventManager().TriggerEvent(playerJoinEvent);
             }
 
-            // Send the position packet 20 times per second.
+            // Send the position packet 35 times per second.
             if(IsLocalPlayer)
             {
-                InvokeRepeating("SendPositionPacket", 1, 0.03f);
+                InvokeRepeating("SendPositionPacket", 1, 0.028f);
                 ClientCubivox.GetClientInstance().LocalPlayer = this;
             }
 
             rigidbody = GetComponent<Rigidbody>();
         }
 
+        void OnDisable()
+        {
+            if (!IsLocalPlayer)
+            {
+                PlayerLeaveEvent playerLeaveEvent = new PlayerLeaveEvent(this);
+                Cubivox.GetEventManager().TriggerEvent(playerLeaveEvent);
+            }
+        }
 
         public Entity GetEntityType()
         {

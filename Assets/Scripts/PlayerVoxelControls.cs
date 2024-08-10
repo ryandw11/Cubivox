@@ -1,12 +1,25 @@
 using CubivoxCore;
+using CubivoxCore.Events.Local;
+using CubivoxCore.Events.Global;
 using CubivoxCore.Voxels;
 
 using CubivoxClient;
 using CubivoxClient.Protocol.ServerBound;
+using CubivoxClient.Utils;
+using CubivoxClient.Voxels;
 using CubivoxClient.Worlds;
 
 using UnityEngine;
 
+/// <summary>
+/// Responsible for handling the Player's voxel place and breaking controls.
+/// 
+/// Voxels are not directly modified on the Client, instead the respective packet is sent
+/// to the server. The server will send a Place or Break packet back, which is when the voxels
+/// are modified.
+/// 
+/// The Place and Break events are triggered BEFORE the packets are sent to the server.
+/// </summary>
 public class PlayerVoxelControls : MonoBehaviour
 {
 
@@ -20,6 +33,15 @@ public class PlayerVoxelControls : MonoBehaviour
 
     // Update is called once per frame
     void Update()
+    {
+        HandleBreakVoxelInput();
+        HandlePlaceVoxelInput();
+    }
+
+    /// <summary>
+    /// Responsible for checking a break voxel input and sending the packet to the server. 
+    /// </summary>
+    private void HandleBreakVoxelInput()
     {
         if (Input.GetKeyUp(KeyCode.Mouse0))
         {
@@ -40,14 +62,33 @@ public class PlayerVoxelControls : MonoBehaviour
 
                 if (voxel != null && voxel.GetVoxelDef() != air)
                 {
-                    clientCubivox.SendPacketToServer(new BreakVoxelPacket(LocationUtils.VectorToLocation(position)));
-                    break;
+                    // Send events and check for response.
+                    // Priority: 1) VoxelDef Events, 2) General Events
+                    VoxelDefBreakEvent voxelDefBreakEvent = new VoxelDefBreakEvent(clientCubivox.LocalPlayer, voxel.GetLocation());
+                    Isolator.Isolate(() => voxel.GetVoxelDef()._BreakEvent?.Invoke(voxelDefBreakEvent));
+                    if (voxelDefBreakEvent.IsCancelled)
+                    {
+                        return;
+                    }
+
+                    VoxelBreakEvent breakEvent = new VoxelBreakEvent(clientCubivox.LocalPlayer, voxel);
+                    if (Cubivox.GetEventManager().TriggerEvent(breakEvent))
+                    {
+                        clientCubivox.SendPacketToServer(new BreakVoxelPacket(LocationUtils.VectorToLocation(position)));
+                    }
+                    return;
                 }
 
                 step += 0.1f;
             }
         }
+    }
 
+    /// <summary>
+    /// Responsible for checking a place voxel input and sending a packet to the server.
+    /// </summary>
+    private void HandlePlaceVoxelInput()
+    {
         if (Input.GetKeyUp(KeyCode.Mouse1))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -68,12 +109,30 @@ public class PlayerVoxelControls : MonoBehaviour
 
                 if (voxel != null && voxel.GetVoxelDef() != air)
                 {
-                    Vector3 realVoxelPos = new Vector3((int)position.x, (int)position.y, (int)position.z);                  
+                    Vector3 realVoxelPos = new Vector3((int)position.x, (int)position.y, (int)position.z);
 
                     VoxelDef testBlock = (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK"));
                     Vector3 newPlacement = NewBlock(realVoxelPos, ray);
-                    clientCubivox.SendPacketToServer(new PlaceVoxelPacket(testBlock, LocationUtils.VectorToLocation(newPlacement)));
-                    break;
+
+                    var newVoxelLocation = LocationUtils.VectorToLocation(newPlacement);
+
+                    // Send events and check for response.
+                    // Priority: 1) VoxelDef Events, 2) General Events
+
+                    VoxelDefPlaceEvent voxelDefPlaceEvent = new VoxelDefPlaceEvent(clientCubivox.LocalPlayer, newVoxelLocation);
+                    Isolator.Isolate(() => testBlock._PlaceEvent?.Invoke(voxelDefPlaceEvent));
+                    if (voxelDefPlaceEvent.IsCancelled)
+                    {
+                        return;
+                    }
+
+                    VoxelPlaceEvent voxelPlaceEvent = new VoxelPlaceEvent(clientCubivox.LocalPlayer, new ClientVoxel(newVoxelLocation, testBlock));
+                    if (Cubivox.GetEventManager().TriggerEvent(voxelPlaceEvent))
+                    {
+                        clientCubivox.SendPacketToServer(new PlaceVoxelPacket(testBlock, newVoxelLocation));
+                    }
+
+                    return;
                 }
 
                 step += 0.4f;
