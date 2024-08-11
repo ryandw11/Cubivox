@@ -4,16 +4,19 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 
 using CubivoxCore;
 using CubivoxCore.BaseGame.VoxelDefs;
-using CubivoxCore.Players;
 using CubivoxCore.Items;
+using CubivoxCore.Mods;
+using CubivoxCore.Players;
 using CubivoxCore.Worlds;
 using CubivoxCore.Worlds.Generation;
 
 using CubivoxClient.BaseGame;
+using CubivoxClient.Events;
 using CubivoxClient.Loggers;
 using CubivoxClient.Players;
 using CubivoxClient.Protocol;
@@ -22,7 +25,6 @@ using CubivoxClient.Protocol.ClientBound;
 using CubivoxClient.Texturing;
 
 using UnityEngine;
-using CubivoxClient.Events;
 
 namespace CubivoxClient
 {
@@ -35,8 +37,9 @@ namespace CubivoxClient
         private bool enabled = false;
         private List<ClientPlayer> players;
         private Dictionary<byte, ClientBoundPacket> packetList;
-
         private ClientLogger logger;
+
+        private List<Mod> mods;
 
         private TcpClient? client;
         private Thread handlePacketsThread;
@@ -72,6 +75,7 @@ namespace CubivoxClient
             packetList = new Dictionary<byte, ClientBoundPacket>();
 
             logger = new ClientLogger("Cubivox");
+            mods = new List<Mod>();
 
             CurrentState = currentScene == CubivoxScene.TitleScene ? GameState.TITLE_SCREEN : GameState.DISCONNECTED;
 
@@ -133,6 +137,8 @@ namespace CubivoxClient
             enabled = true;
 
             LoadItemsStage(itemRegistry);
+
+            LoadMods();
         }
 
         public static ClientCubivox GetClientInstance()
@@ -348,6 +354,89 @@ namespace CubivoxClient
 
         public override void AssertClient()
         {
+        }
+
+
+        /// <summary>
+        /// Basic Mod Loader
+        /// 
+        /// Reads, loads, and setup the mods.
+        /// </summary>
+        private void LoadMods()
+        {
+            // TODO: This is a pretty hacky mod loader. This should be replaced with a better system later.
+            DirectoryInfo modDirectory = new DirectoryInfo(CubivoxController.scModsFolder);
+            foreach (FileInfo file in modDirectory.GetFiles())
+            {
+                var dll = Assembly.LoadFile(file.FullName);
+                var resourceName = file.Name.Replace(".dll", "") + ".mod.json";
+
+                string resource = null;
+                using (Stream stream = dll.GetManifestResourceStream(resourceName))
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        resource = reader.ReadToEnd();
+                    }
+                }
+
+                if (resource == null)
+                {
+                    logger.Error($"Failed to load mod {file.Name}! Is the mod.json file in the right namespace?");
+                    continue;
+                }
+
+                logger.Info(resource);
+
+                ModDescriptionFile descriptionFile = JsonUtility.FromJson<ModDescriptionFile>(resource);
+
+                var mainModClass = dll.GetType(descriptionFile.MainClass);
+
+                if (mainModClass == null)
+                {
+                    logger.Error($"Failed to load mod {file.Name}! Cannot find the mod's main class {descriptionFile.MainClass}!");
+                    continue;
+                }
+
+                ClientLogger modLogger = new ClientLogger(descriptionFile.ModName);
+
+                CubivoxMod mod = (CubivoxMod)Activator.CreateInstance(mainModClass, descriptionFile, logger);
+
+                if (mod == null)
+                {
+                    logger.Error($"Failed to load mod {file.Name}! Unable to construct main mod class instance.");
+                    continue;
+                }
+
+                mods.Add(mod);
+                logger.Info($"Found and loaded mod {descriptionFile.ModName}.");
+            }
+
+            foreach (Mod mod in mods)
+            {
+                try
+                {
+                    mod.LoadItemsStage(itemRegistry);
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"An internal error has occur for {mod.GetName()}:");
+                    logger.Error(ex.ToString());
+                }
+            }
+
+            foreach (Mod mod in mods)
+            {
+                try
+                {
+                    mod.OnEnable();
+                }
+                catch (Exception ex)
+                {
+                    logger.Error($"An internal error has occur for {mod.GetName()}:");
+                    logger.Error(ex.ToString());
+                }
+            }
         }
     }
 }

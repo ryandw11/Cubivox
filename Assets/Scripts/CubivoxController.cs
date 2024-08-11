@@ -5,6 +5,7 @@ using UnityEngine;
 
 using CubivoxClient;
 using CubivoxCore;
+using System.IO;
 
 /// <summary>
 /// This is the controller of cubivox. It contains <see cref="ClientCubivox"/>, which is the
@@ -14,6 +15,14 @@ using CubivoxCore;
 /// </summary>
 public class CubivoxController : MonoBehaviour
 {
+    /// <summary>
+    /// The folder to store persistent user game data.
+    /// 
+    /// On Windows:
+    /// C:\Users\[USERNAME]\AppData\Roaming\Cubivox
+    /// </summary>
+    public static readonly string scGameDataFolder = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Cubivox");
+    public static readonly string scModsFolder = Path.Join(scGameDataFolder, "Mods");
 
     public GameObject playerPrefab;
     public CubivoxScene cubivoxScene;
@@ -27,7 +36,7 @@ public class CubivoxController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(instance != null)
+        if (instance != null)
         {
             Debug.Log("Changing instances of the CubivoxController"); 
         }
@@ -36,6 +45,10 @@ public class CubivoxController : MonoBehaviour
 
         if (!ClientCubivox.HasInstance())
         {
+            // The game has started for the first time.
+            EnsureGameDataFolders();
+
+            // Setup Cubivox Client
             Debug.Log("Initalizing Client Cubivox...");
             this.clientCubivox = new ClientCubivox(cubivoxScene);
             this.clientCubivox.OnEnable();
@@ -47,7 +60,8 @@ public class CubivoxController : MonoBehaviour
                 System.Random rand = new System.Random();
                 clientCubivox.ConnectToServer("localhost", 5555, $"Test{rand.Next(0, 100)}");
             }
-        } else
+        }
+        else
         {
             clientCubivox = ClientCubivox.GetClientInstance();
         }
@@ -79,6 +93,24 @@ public class CubivoxController : MonoBehaviour
     public ClientCubivox GetCubivox()
     {
         return clientCubivox;
+    }
+
+    /// <summary>
+    /// Ensures that the game data folders habe been created and is valid.
+    /// 
+    /// Folders Currently Include:
+    /// - Mod Folder
+    /// </summary>
+    public void EnsureGameDataFolders()
+    {
+        if (!Directory.Exists(scGameDataFolder))
+        {
+            Directory.CreateDirectory(scGameDataFolder);
+        }
+        if (!Directory.Exists(scModsFolder))
+        {
+            Directory.CreateDirectory(scModsFolder);
+        }
     }
 
     public static void RunOnMainThread(Action action)
