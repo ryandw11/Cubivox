@@ -1,3 +1,6 @@
 [submodule "Assets/Scripts/CubivoxCore"]
 	path = Assets/Scripts/CubivoxCore
 	url = https://github.com/ryandw11/CubivoxCore.git
+[submodule "Submodules/CubivoxCore"]
+	path = Submodules/CubivoxCore
+	url = https://github.com/ryandw11/CubivoxCore.git

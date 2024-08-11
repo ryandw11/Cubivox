@@ -119,7 +119,7 @@ namespace CubivoxClient
 
             // TODO: Modify RegisterItem to also register the texture.
             TestVoxel testVoxel = new TestVoxel(this);
-            itemRegistry.RegisterItem(new TestVoxel(this));
+            itemRegistry.RegisterItem(testVoxel);
             textureAtlas.RegisterTexture(testVoxel.GetAtlasTexture(), true);
         }
 

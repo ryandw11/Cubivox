@@ -1,4 +1,6 @@
-﻿using CubivoxCore.Attributes;
+﻿using System.Runtime;
+
+using CubivoxCore.Attributes;
 using CubivoxCore.Mods;
 using CubivoxCore.Voxels;
 
