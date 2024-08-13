@@ -44,6 +44,7 @@ namespace CubivoxClient
         private TcpClient? client;
         private Thread handlePacketsThread;
         private Thread mainThread;
+        private volatile bool shouldTerminate = false;
 
         public GameState CurrentState { get; internal set; }
 
@@ -55,13 +56,16 @@ namespace CubivoxClient
             get { return _localPlayer; }
             internal set
             {
-                if( _localPlayer != null && value != null )
+                if (_localPlayer != null && value != null)
                 {
                     throw new Exception("Cannot set the local place twice!");
                 }
 
                 _localPlayer = value;
-                _localPlayer.Uuid = localPlayerUuid;
+                if (value != null)
+                {
+                    _localPlayer.Uuid = localPlayerUuid;
+                }
             }
         }
 
@@ -178,6 +182,7 @@ namespace CubivoxClient
             }
             DisconnectionReason = reason;
 
+            shouldTerminate = true;
             handlePacketsThread.Abort();
             if (client != null)
                 client.Close();
@@ -248,20 +253,37 @@ namespace CubivoxClient
                 {
                     handlePacketsThread = new Thread(() =>
                     {
-                        while (true)
+                        while (!shouldTerminate)
                         {
-                            if ( client.GetStream().DataAvailable )
+                            try
                             {
-                                try
+                                if (client.GetStream().DataAvailable)
                                 {
                                     ReadPackets();
                                 }
-                                catch (IOException)
+                            }
+                            catch (SocketException)
+                            {
+                                GetLogger().Info("[Networking] Disconnected from the game!");
+                                DisconnectClient("Lost connection to host server.");
+                                return;
+                            }
+                            catch (Exception ex)
+                            {
+                                if( !client.Connected )
                                 {
-                                    Debug.Log("[Networking] Disconnected from the game!");
+                                    // Assume client was disconnected.
                                     DisconnectClient("Lost connection to host server.");
                                 }
+                                else
+                                {
+                                    DisconnectClient("An internal error has occured when processing packets!");
+                                }
+                                GetLogger().Error(ex.Message);
+                                GetLogger().Error(ex.StackTrace);
+                                return;
                             }
+
                         }
                     });
                     handlePacketsThread.Start();
@@ -309,40 +331,28 @@ namespace CubivoxClient
             byte[] id = new byte[1];
             if(stream.Read(id, 0, 1) != 1)
             {
-                Debug.LogWarning("[Networking] Error: Could not read byte from NetworkStream!");
+                GetLogger().Warn("[Networking] Error: Could not read byte from NetworkStream!");
                 return;
             }
             try
             {
-                //Debug.Log("Reading Packet: " + packetList[id[0]]);
                 if (!packetList[id[0]].ProcessPacket(this, stream))
                 {
-                    Debug.LogWarning($"[Networking] Error: Invalid packet recived from Server! Packet Id: {(int)id[0]}");
-                    Debug.LogWarning("[Networking] Clearing out the network stream.");
-                    // Clear out the network stream.
-                    byte[] buffer = new byte[4096];
-                    while(stream.DataAvailable)
-                    {
-                        stream.Read(buffer, 0, buffer.Length);
-                    }
+                    GetLogger().Error($"[Networking] Error: Invalid packet recived from Server! Packet Id: {(int)id[0]}");
+                    GetLogger().Error("[Networking] Clearing out the network stream.");
+                    DisconnectClient("Invalid packet recieved from the server.");
                 }
-                //Debug.Log("Done Reading Packet");
             } 
             catch(KeyNotFoundException ex)
             {
-                Debug.LogWarning($"[Networking] Error: No packet with id {(int)id[0]} exists!");
-                Debug.LogWarning("[Networking] Clearing out the network stream.");
-                // Clear out the network stream.
-                byte[] buffer = new byte[4096];
-                while (stream.DataAvailable)
-                {
-                    stream.Read(buffer, 0, buffer.Length);
-                }
+                GetLogger().Error($"[Networking] Error: No packet with id {(int)id[0]} exists!");
+                GetLogger().Error("[Networking] Clearing out the network stream.");
+                DisconnectClient("Invalid packet recieved from the server.");
             }
             catch (Exception ex)
             {
-                Debug.Log(ex.ToString());
-                Debug.LogError("[Networking | ERROR] Unable to process packets from server, disconnecting...");
+                GetLogger().Error("[Networking | ERROR] Unable to process packets from server, disconnecting...");
+                GetLogger().Error(ex.StackTrace);
                 DisconnectClient("Invalid response recieved from server.");
             }
         }

@@ -28,15 +28,16 @@ public class PlayerCapsuleMovement : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (clientCubivox.CurrentState != GameState.PLAYING) return;
-
         if (clientCubivox.CurrentState == GameState.PLAYING && Cursor.lockState != CursorLockMode.Locked)
         {
             Cursor.lockState = CursorLockMode.Locked;
-        } else if(clientCubivox.CurrentState != GameState.PLAYING && Cursor.lockState != CursorLockMode.None)
+        }
+        else if (clientCubivox.CurrentState != GameState.PLAYING && Cursor.lockState != CursorLockMode.None)
         {
             Cursor.lockState = CursorLockMode.None;
         }
+
+        if (clientCubivox.CurrentState != GameState.PLAYING) return;
 
         var previousPosition = transform.position;
 
