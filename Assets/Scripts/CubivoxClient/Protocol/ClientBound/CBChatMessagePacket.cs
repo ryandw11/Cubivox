@@ -1,4 +1,5 @@
 using CubivoxClient.Worlds;
+using CubivoxCore.Scheduler;
 using System;
 using System.Linq;
 using System.Net.Sockets;
@@ -28,7 +29,7 @@ namespace CubivoxClient.Protocol.ClientBound
 
                 Debug.Log("Got Chat Message: " + message);
 
-                CubivoxController.RunOnMainThread(() => {
+                CubivoxScheduler.RunOnMainThread(() => {
                     ChatUI.Instance.SendChatMessage(message);
                 });
             }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CubivoxCore.Scheduler;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -25,7 +26,7 @@ namespace CubivoxClient.Protocol.ClientBound
             NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             double z = BitConverter.ToDouble(locBuffer);
 
-            CubivoxController.RunOnMainThread(() => {
+            CubivoxScheduler.RunOnMainThread(() => {
                 if( clientCubivox.LocalPlayer.Uuid == uuid )
                 {
                     // If the local player, move the position.

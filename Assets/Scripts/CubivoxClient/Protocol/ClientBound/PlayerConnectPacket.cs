@@ -1,4 +1,5 @@
 ﻿using CubivoxClient.Players;
+using CubivoxCore.Scheduler;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,7 +30,7 @@ namespace CubivoxClient.Protocol.ClientBound
             NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             double z = BitConverter.ToDouble(locBuffer);
 
-            CubivoxController.RunOnMainThread(() =>
+            CubivoxScheduler.RunOnMainThread(() =>
             {
                 GameObject[] objs = GameObject.FindGameObjectsWithTag("GameController");
                 if (objs.Length == 0)

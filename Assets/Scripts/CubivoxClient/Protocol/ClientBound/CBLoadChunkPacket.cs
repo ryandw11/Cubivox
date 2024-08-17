@@ -10,6 +10,7 @@ using System.Net.Sockets;
 
 using UnityEngine;
 using CubivoxCore.Worlds;
+using CubivoxCore.Scheduler;
 
 namespace CubivoxClient.Protocol.ClientBound
 {
@@ -44,7 +45,7 @@ namespace CubivoxClient.Protocol.ClientBound
             voxelBuffer = Decompress(voxelBuffer);
             byte[,,] voxels = MemoryUtils.OneDArrayTo3DArray(ref voxelBuffer, ClientChunk.CHUNK_SIZE);
 
-            CubivoxController.RunOnMainThread(() => {
+            CubivoxScheduler.RunOnMainThread(() => {
                 ClientWorld world = WorldManager.GetInstance().GetCurrentWorld();
 
                 // Check if the chunk already exists, if so replace it.

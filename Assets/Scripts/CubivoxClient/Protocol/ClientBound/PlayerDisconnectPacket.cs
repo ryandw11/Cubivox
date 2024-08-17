@@ -1,4 +1,5 @@
 ﻿using CubivoxClient.Players;
+using CubivoxCore.Scheduler;
 using System;
 using System.Net.Sockets;
 
@@ -15,7 +16,7 @@ namespace CubivoxClient.Protocol.ClientBound
 
             Guid uuid = new Guid(rawUuid);
 
-            CubivoxController.RunOnMainThread(() =>
+            CubivoxScheduler.RunOnMainThread(() =>
             {
                 GameObject user = GameObject.Find(uuid.ToString());
                 if(user == null)

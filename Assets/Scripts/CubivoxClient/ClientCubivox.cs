@@ -25,6 +25,8 @@ using CubivoxClient.Protocol.ClientBound;
 using CubivoxClient.Texturing;
 
 using UnityEngine;
+using CubivoxClient.Mods;
+using CubivoxCore.Scheduler;
 
 namespace CubivoxClient
 {
@@ -174,7 +176,7 @@ namespace CubivoxClient
         {
             if (Thread.CurrentThread != mainThread)
             {
-                CubivoxController.RunOnMainThread(() =>
+                CubivoxScheduler.RunOnMainThread(() =>
                 {
                     DisconnectClient(reason);
                 });
@@ -398,7 +400,7 @@ namespace CubivoxClient
 
                 logger.Info(resource);
 
-                ModDescriptionFile descriptionFile = JsonUtility.FromJson<ModDescriptionFile>(resource);
+                ModDescriptionFile descriptionFile = ModDescriptionUtils.ClientToCoreDescriptionFile(JsonUtility.FromJson<ClientModDescriptionFile>(resource) );
 
                 var mainModClass = dll.GetType(descriptionFile.MainClass);
 

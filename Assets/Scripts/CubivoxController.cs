@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using CubivoxClient;
@@ -30,8 +28,6 @@ public class CubivoxController : MonoBehaviour
     private ClientCubivox clientCubivox;
 
     private static CubivoxController instance;
-    private Queue<Action> mainThreadQueue = new Queue<Action>();
-    private volatile bool hasItemsInQueue = false;
 
     // Start is called before the first frame update
     void Start()
@@ -71,18 +67,6 @@ public class CubivoxController : MonoBehaviour
     void Update()
     {
         clientCubivox.Update();
-
-        if(hasItemsInQueue)
-        {
-            lock (mainThreadQueue)
-            {
-                while(mainThreadQueue.Count != 0)
-                {
-                    mainThreadQueue.Dequeue().Invoke();
-                }
-                hasItemsInQueue = false;
-            }
-        }
     }
 
     void OnApplicationQuit()
@@ -111,14 +95,5 @@ public class CubivoxController : MonoBehaviour
         {
             Directory.CreateDirectory(scModsFolder);
         }
-    }
-
-    public static void RunOnMainThread(Action action)
-    {
-        lock(instance.mainThreadQueue)
-        {
-            instance.mainThreadQueue.Enqueue(action);
-        }
-        instance.hasItemsInQueue = true;
     }
 }

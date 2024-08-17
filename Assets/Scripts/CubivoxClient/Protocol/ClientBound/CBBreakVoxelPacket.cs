@@ -1,4 +1,5 @@
 using CubivoxClient.Worlds;
+using CubivoxCore.Scheduler;
 using System;
 using System.Net.Sockets;
 
@@ -18,7 +19,7 @@ namespace CubivoxClient.Protocol.ClientBound
             NetworkingUtils.FillBufferFromNetwork(locBuffer, stream);
             int z = BitConverter.ToInt32(locBuffer);
 
-            CubivoxController.RunOnMainThread(() => {
+            CubivoxScheduler.RunOnMainThread(() => {
                 ClientWorld world = WorldManager.GetInstance().GetCurrentWorld();
                 world.SetVoxel(x, y, z, clientCubivox.GetClientItemRegistry().GetVoxelDef(0));
             });

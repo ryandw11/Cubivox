@@ -9,6 +9,7 @@ using UnityEngine;
 
 using CubivoxClient.Players;
 using CubivoxClient.Protocol.DataFormats;
+using CubivoxCore.Scheduler;
 
 namespace CubivoxClient.Protocol.ClientBound
 {
@@ -25,7 +26,7 @@ namespace CubivoxClient.Protocol.ClientBound
             string jsonString = Encoding.ASCII.GetString(data);
             var jsonObj = JsonUtility.FromJson<ConnectionResponseData>(jsonString);
 
-            CubivoxController.RunOnMainThread(() =>
+            CubivoxScheduler.RunOnMainThread(() =>
             {
                 GameObject[] objs = GameObject.FindGameObjectsWithTag("GameController");
                 if(objs.Length == 0)
