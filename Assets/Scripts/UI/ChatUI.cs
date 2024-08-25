@@ -1,3 +1,4 @@
+using CubivoxCore.Scheduler;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -32,6 +33,9 @@ public class ChatUI : MonoBehaviour
 
     public void SendChatMessage(string message)
     {
-        text.text += "\n" + message;
+        CubivoxScheduler.RunOnMainThreadSynchronized(() =>
+        {
+            text.text += "\n" + message;
+        });
     }
 }

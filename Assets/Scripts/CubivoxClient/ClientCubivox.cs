@@ -30,6 +30,11 @@ using CubivoxCore.Scheduler;
 
 namespace CubivoxClient
 {
+
+    // When it comes to thread saftey the following points are assumed:
+    // 1) Most items will not be modified after this class is constructed.
+    // 2) Items that are modified and are required to be thread safe by the core are guareded by mLock.
+    // 3) Everything else is not thread safe.
     public class ClientCubivox : Cubivox
     {
         public static readonly short PROTOCOL_VERSION = 0x0;
@@ -71,6 +76,12 @@ namespace CubivoxClient
             }
         }
 
+
+        // General purpose lock to guard some of Cubivox's internal lists.
+        // The following items are guarded:
+        // 1) Online Player List
+        private object mLock = new object();
+
         public ClientCubivox(CubivoxScene currentScene)
         {
             instance = this;
@@ -111,7 +122,10 @@ namespace CubivoxClient
 
         public override ReadOnlyCollection<Player> GetOnlinePlayersImpl()
         {
-            return players.Cast<Player>().ToList().AsReadOnly();
+            lock( mLock )
+            {
+                return players.Cast<Player>().ToList().AsReadOnly();
+            }
         }
 
         public override ReadOnlyCollection<World> GetWorldsImpl()
@@ -162,9 +176,18 @@ namespace CubivoxClient
             return (ClientItemRegistry) itemRegistry;
         }
 
-        public List<ClientPlayer> GetPlayers()
+        /// <summary>
+        /// Add a player to the list of online players.
+        /// 
+        /// <para>This method is thread safe.</para>
+        /// </summary>
+        /// <param name="player">The player to add.</param>
+        internal void AddPlayer(ClientPlayer player)
         {
-            return players;
+            lock (mLock)
+            {
+                players.Add(player);
+            }
         }
 
         /// <summary>
@@ -238,13 +261,24 @@ namespace CubivoxClient
             packetList.Add(clientBoundPacket.GetType(), clientBoundPacket);
         }
 
+        /// <summary>
+        /// Handle a user disconnecting form the game.
+        /// 
+        /// <para>This method is thread safe.</para>
+        /// </summary>
+        /// <param name="clientPlayer">The player to disconnect,</param>
         internal void HandleUserDisconnect(ClientPlayer clientPlayer)
         {
-            if(clientPlayer.IsLocalPlayer)
+            if (clientPlayer.IsLocalPlayer)
             {
-                Debug.LogError("An attempt was made to disconnect a the local player!");
+                GetLogger().Error("An attempt was made to disconnect a the local player!");
+                return;
             }
-            players.Remove(clientPlayer);
+
+            lock (mLock)
+            {
+                players.Remove(clientPlayer);
+            }
         }
 
         internal void StartListeningForPackets()

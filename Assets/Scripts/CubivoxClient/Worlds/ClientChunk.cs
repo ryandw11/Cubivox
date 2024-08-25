@@ -5,6 +5,7 @@ using System.Linq;
 using CubivoxCore;
 using CubivoxCore.BaseGame.VoxelDefs;
 using CubivoxCore.Exceptions;
+using CubivoxCore.Scheduler;
 using CubivoxCore.Utils;
 using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
@@ -28,6 +29,8 @@ namespace CubivoxClient.Worlds
         private Dictionary<byte, short> voxelMap = new Dictionary<byte, short>();
         private byte currentVoxelIndex = 0;
 
+        private object mLock = new object();
+
         private JobHandle jobHandle;
         RenderChunkJob.MeshOutput meshOutput;
         NativeArray<RenderVoxel> voxs;
@@ -43,7 +46,12 @@ namespace CubivoxClient.Worlds
 
         public Voxel GetVoxel(int x, int y, int z)
         {
-            byte id = voxels[CMath.mod(x, CHUNK_SIZE), CMath.mod(y, CHUNK_SIZE), CMath.mod(z, CHUNK_SIZE)];
+            byte id = 0;
+
+            lock (mLock)
+            {
+                id = voxels[CMath.mod(x, CHUNK_SIZE), CMath.mod(y, CHUNK_SIZE), CMath.mod(z, CHUNK_SIZE)];
+            }
             
             return ByteToVoxel(id, new Location(GetWorld(), x, y, z));
         }
@@ -56,20 +64,24 @@ namespace CubivoxClient.Worlds
         public void SetVoxel(int x, int y, int z, VoxelDef voxelDef)
         {
             SetLocalVoxel(CMath.mod(x, CHUNK_SIZE), CMath.mod(y, CHUNK_SIZE), CMath.mod(z, CHUNK_SIZE), voxelDef);
+            UpdateChunk();
         }
 
         public void SetLocalVoxel(int x, int y, int z, VoxelDef voxelDef)
         {
-            short voxelId = ClientCubivox.GetClientInstance().GetClientItemRegistry().GetVoxelDefId(voxelDef);
-            if(voxelMap.ContainsValue(voxelId))
+            lock (mLock)
             {
-                byte key = voxelMap.First(pair => pair.Value == voxelId).Key;
-                voxels[x, y, z] = key;
-            }
-            else
-            {
-                voxelMap[currentVoxelIndex] = voxelId;
-                currentVoxelIndex++;
+                short voxelId = ClientCubivox.GetClientInstance().GetClientItemRegistry().GetVoxelDefId(voxelDef);
+                if (voxelMap.ContainsValue(voxelId))
+                {
+                    byte key = voxelMap.First(pair => pair.Value == voxelId).Key;
+                    voxels[x, y, z] = key;
+                }
+                else
+                {
+                    voxelMap[currentVoxelIndex] = voxelId;
+                    currentVoxelIndex++;
+                }
             }
         }
 
@@ -80,9 +92,12 @@ namespace CubivoxClient.Worlds
 
         public void PopulateChunk(byte[,,] voxels, Dictionary<byte, short> voxelMap, byte currentVoxelIndex)
         {
-            this.voxels = voxels;
-            this.voxelMap = voxelMap;
-            this.currentVoxelIndex = currentVoxelIndex;
+            lock( mLock )
+            {
+                this.voxels = voxels;
+                this.voxelMap = voxelMap;
+                this.currentVoxelIndex = currentVoxelIndex;
+            }
         }
 
         // Use this for initialization
@@ -105,10 +120,10 @@ namespace CubivoxClient.Worlds
                         triangles = meshOutput.indicies.ToArray(),
                         uv = meshOutput.textures.ToArray().Select(vertex => new Vector2(vertex.x, vertex.y)).ToArray()
                     };
-                    vertices.Dispose(jobHandle);
-                    indicies.Dispose(jobHandle);
-                    textures.Dispose(jobHandle);
-                    voxs.Dispose(jobHandle);
+                    vertices.Dispose();
+                    indicies.Dispose();
+                    textures.Dispose();
+                    voxs.Dispose();
 
                     mesh.RecalculateNormals();
                     mesh.RecalculateBounds();
@@ -122,6 +137,17 @@ namespace CubivoxClient.Worlds
         }
 
         public void UpdateChunk()
+        {
+            CubivoxScheduler.RunOnMainThreadSynchronized(() =>
+            {
+                lock (mLock)
+                {
+                    UpdateChunkLocked();
+                }
+            });
+        }
+
+        private void UpdateChunkLocked()
         {
             if (hasJob) return;
             voxs = new NativeArray<RenderVoxel>(CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE, Allocator.TempJob);
@@ -180,7 +206,7 @@ namespace CubivoxClient.Worlds
                 }
             }.Schedule();
 
-            hasJob = true;  
+            hasJob = true;
         }
 
         private int XYZToI(int x, int y, int z)

@@ -14,6 +14,7 @@ using CubivoxCore.Events.Global;
 using CubivoxCore.Players;
 using CubivoxCore.Exceptions;
 using CubivoxClient.Protocol.ServerBound;
+using CubivoxCore.Scheduler;
 
 namespace CubivoxClient.Players
 {
@@ -31,7 +32,7 @@ namespace CubivoxClient.Players
 
         void Start()
         {
-            ClientCubivox.GetClientInstance().GetPlayers().Add(this);
+            ClientCubivox.GetClientInstance().AddPlayer(this);
 
             if (!IsLocalPlayer)
             {
@@ -97,6 +98,8 @@ namespace CubivoxClient.Players
             {
                 throw new InvalidEnvironmentException("You can only send a message to the local player!");
             }
+
+            ChatUI.Instance.SendChatMessage(message);
         }
 
         void Update()
@@ -136,7 +139,11 @@ namespace CubivoxClient.Players
             {
                 throw new InvalidEnvironmentException("Only the local player's position can be modified.");
             }
-            transform.position = LocationUtils.LocationToVector(location);
+
+            CubivoxScheduler.RunOnMainThreadSynchronized(() =>
+            {
+                transform.position = LocationUtils.LocationToVector(location);
+            });
         }
     }
 }

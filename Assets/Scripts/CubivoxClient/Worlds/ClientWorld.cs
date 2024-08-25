@@ -6,9 +6,6 @@ using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
 using CubivoxCore.Worlds.Generation;
 
-using CubivoxClient;
-using CubivoxClient.Texturing;
-
 using UnityEngine;
 
 namespace CubivoxClient.Worlds
@@ -27,10 +24,7 @@ namespace CubivoxClient.Worlds
 
         public void AddLoadedChunk(ClientChunk chunk)
         {
-            lock (loadedChunks)
-            {
-                loadedChunks.TryAdd(chunk.GetLocation(), chunk);
-            }
+            loadedChunks.TryAdd(chunk.GetLocation(), chunk);
         }
 
         public void RemoveLoadedChunk(ClientChunk chunk)
@@ -79,13 +73,7 @@ namespace CubivoxClient.Worlds
 
         public void LoadChunk(Location location)
         {
-            GameObject gameObject = new GameObject($"Chunk{{{location.x}, {location.y}, {location.z}}}");
-            gameObject.transform.position = new Vector3((float)location.x * 16, (float)location.y * 16, (float)location.z * 16);
-            MeshCollider meshCollider = gameObject.AddComponent<MeshCollider>();
-            MeshFilter meshFilter = gameObject.AddComponent<MeshFilter>();
-            MeshRenderer meshRenderer = gameObject.AddComponent<MeshRenderer>();
-            meshRenderer.sharedMaterial = ((ClientTextureAtlas)Cubivox.GetTextureAtlas()).GetMaterial();
-            ClientChunk clientChunk = gameObject.AddComponent<ClientChunk>();
+            throw new InvalidEnvironmentException("The client cannot load chunks!");
         }
 
         public void LoadChunk(int x, int y, int z)
@@ -129,12 +117,11 @@ namespace CubivoxClient.Worlds
 
             if (chunk == null)
             {
-                Debug.LogWarning("Tried to set a Voxel when the chunk was not loaded!");
+                ClientCubivox.GetClientInstance().GetLogger().Warn("Tried to set a Voxel when the chunk was not loaded!");
                 return;
             }
 
             chunk.SetVoxel(x, y, z, voxel);
-            chunk.UpdateChunk();
         }
 
         public void UnloadChunk(int x, int y, int z)
