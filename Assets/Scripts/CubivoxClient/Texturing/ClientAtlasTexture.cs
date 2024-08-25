@@ -3,15 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CubivoxCore.Mods;
 using CubivoxCore.Texturing;
 
 namespace CubivoxClient.Texturing
 {
     public class ClientAtlasTexture : AtlasTexture
     {
-        public ClientAtlasTexture(string location) : base(location.Replace(".png", ""))
-        {}
+        public ClientAtlasTexture(Mod mod, TextureRoot root, string location) : base(mod, root, location)
+        {
+            if (root == TextureRoot.CUBIVOX)
+            {
+                // Unity Resources don't need an extension.
+                Location = Location.Replace(".png", "");
+            }
+        }
 
         /**
          * <summary>Initalize the data for the texture atlas.</summary>

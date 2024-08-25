@@ -18,6 +18,7 @@ using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using CubivoxClient.Texturing;
 
 namespace CubivoxClient.Worlds
 {
@@ -38,6 +39,8 @@ namespace CubivoxClient.Worlds
         NativeList<float2> textures;
         NativeList<int> indicies;
         bool hasJob = false;
+
+        private ClientTextureAtlas clientTextureAtlas;
 
         public Location GetLocation()
         {
@@ -103,7 +106,8 @@ namespace CubivoxClient.Worlds
         // Use this for initialization
         void Start()
         {
-            
+            clientTextureAtlas = (ClientTextureAtlas) ClientCubivox.GetTextureAtlas();
+            clientTextureAtlas.AtlasRecalculatedEvent += HandleAtlasUpdate;
         }
 
         // Update is called once per frame
@@ -134,6 +138,12 @@ namespace CubivoxClient.Worlds
                     hasJob = false;
                 }
             }
+        }
+
+        private void HandleAtlasUpdate()
+        {
+            // Atlas coordinates may have changed, update the chunk.
+            UpdateChunk();
         }
 
         public void UpdateChunk()

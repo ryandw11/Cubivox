@@ -85,8 +85,8 @@ namespace CubivoxClient
         public ClientCubivox(CubivoxScene currentScene)
         {
             instance = this;
-            itemRegistry = new ClientItemRegistry();
-            textureAtlas = new ClientTextureAtlas(new List<ClientAtlasTexture>(), "/tmp");
+            textureAtlas = new ClientTextureAtlas(new List<ClientAtlasTexture>());
+            itemRegistry = new ClientItemRegistry((ClientTextureAtlas) textureAtlas);
             eventManager = new ClientEventManager();
             players = new List<ClientPlayer>();
             packetList = new Dictionary<byte, ClientBoundPacket>();
@@ -140,7 +140,6 @@ namespace CubivoxClient
             // TODO: Modify RegisterItem to also register the texture.
             TestVoxel testVoxel = new TestVoxel(this);
             itemRegistry.RegisterItem(testVoxel);
-            textureAtlas.RegisterTexture(testVoxel.GetAtlasTexture(), true);
         }
 
         public override void LoadGeneratorsStage(GeneratorRegistry generatorRegistry)
@@ -415,7 +414,7 @@ namespace CubivoxClient
             foreach (FileInfo file in modDirectory.GetFiles())
             {
                 var dll = Assembly.LoadFile(file.FullName);
-                var resourceName = file.Name.Replace(".dll", "") + ".mod.json";
+                var resourceName = dll.GetName().Name + ".mod.json";
 
                 string resource = null;
                 using (Stream stream = dll.GetManifestResourceStream(resourceName))
@@ -446,7 +445,7 @@ namespace CubivoxClient
 
                 ClientLogger modLogger = new ClientLogger(descriptionFile.ModName);
 
-                CubivoxMod mod = (CubivoxMod)Activator.CreateInstance(mainModClass, descriptionFile, logger);
+                CubivoxMod mod = (CubivoxMod)Activator.CreateInstance(mainModClass, descriptionFile, modLogger);
 
                 if (mod == null)
                 {
@@ -470,6 +469,9 @@ namespace CubivoxClient
                     logger.Error(ex.ToString());
                 }
             }
+
+            // Recacluate the texture atlas after loading all mods
+            textureAtlas.RecalculateTextureAtlas();
 
             foreach (Mod mod in mods)
             {

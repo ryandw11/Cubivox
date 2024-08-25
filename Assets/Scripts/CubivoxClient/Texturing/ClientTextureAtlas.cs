@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using CubivoxCore;
+using CubivoxCore.Mods;
 using CubivoxCore.Texturing;
 
 using UnityEngine;
@@ -12,29 +14,28 @@ namespace CubivoxClient.Texturing
 {
     public class ClientTextureAtlas : TextureAtlas
     {
-        private string output;
-        private List<ClientAtlasTexture> textures;
-        private int textureWidth;
-        private int textureHeight;
-        private Texture2D texture;
-        private int numberOfRows;
-        private Material material;
+        private List<ClientAtlasTexture> mTextures;
+        private int mTextureWidth;
+        private int mTextureHeight;
+        private Texture2D mTexture;
+        private int mNumberOfRows;
+        private Material mMaterial;
+
+        public event AtlasRecalculatedEventHandler AtlasRecalculatedEvent;
 
         /**
          * <summary>Create a new texture atlas.</summary>
          * <param name="textures">The list of textures.</param>
-         * <param name="output">The output value.</param>
          * <param name="textureWidth">The width of the textures.</param>
          * <param name="textureHeight">The height of the textures.</param>
          */
-        public ClientTextureAtlas(List<ClientAtlasTexture> textures, string output, int textureWidth, int textureHeight)
+        public ClientTextureAtlas(List<ClientAtlasTexture> textures, int textureWidth, int textureHeight)
         {
-            this.textures = textures;
-            this.output = output;
-            this.textureWidth = textureWidth;
-            this.textureHeight = textureHeight;
+            mTextures = textures;
+            mTextureWidth = textureWidth;
+            mTextureHeight = textureHeight;
 
-            material = new Material(Shader.Find("Standard"));
+            mMaterial = new Material(Shader.Find("Standard"));
 
             CalculateTextureAtlas(textures);
         }
@@ -42,54 +43,55 @@ namespace CubivoxClient.Texturing
         /**
          * <summary>Create a new texture atlas with the default size.</summary>
          * <param name="textures">The list of textures.</param>
-         * <param name="output">The output.</param>
          */
-        public ClientTextureAtlas(List<ClientAtlasTexture> textures, string output) : this(textures, output, 400, 300) { }
+        public ClientTextureAtlas(List<ClientAtlasTexture> textures) : this(textures, 400, 300) { }
 
         public int GetNumberOfRows()
         {
-            return numberOfRows;
+            return mNumberOfRows;
         }
 
         public int GetTextureHeight()
         {
-            return textureHeight;
+            return mTextureHeight;
         }
 
         public List<AtlasTexture> GetTextures()
         {
-            return textures.Select(texture => (AtlasTexture) texture).ToList();
+            return mTextures.Select(texture => (AtlasTexture) texture).ToList();
         }
 
         public int GetTextureWidth()
         {
-            return textureWidth;
+            return mTextureWidth;
         }
 
         public float GetXOffset(int id)
         {
-            return ((float)id % numberOfRows) / numberOfRows;
+            return ((float)id % mNumberOfRows) / mNumberOfRows;
         }
 
         public float GetYOffset(int id)
         {
-            return Mathf.Floor(id / numberOfRows) / numberOfRows;
+            return Mathf.Floor(id / mNumberOfRows) / mNumberOfRows;
         }
 
         public void RecalculateTextureAtlas()
         {
-            CalculateTextureAtlas(textures);
-            material.mainTexture = texture;
+            CalculateTextureAtlas(mTextures);
+            mMaterial.mainTexture = mTexture;
+
+            AtlasRecalculatedEvent?.Invoke();
         }
 
         public void RegisterTexture(AtlasTexture texture, bool recalculateAtlas)
         {
             if(!(texture is ClientAtlasTexture))
             {
-                throw new ArgumentException("Provided texture must be a client texture!", "texture");
+                throw new ArgumentException("Provided texture must be a client texture and non-null!", "texture");
             }
 
-            textures.Add((ClientAtlasTexture) texture);
+            mTextures.Add((ClientAtlasTexture) texture);
 
             if (recalculateAtlas)
                 RecalculateTextureAtlas();
@@ -97,65 +99,67 @@ namespace CubivoxClient.Texturing
 
         public void SetTextureSize(int width, int height)
         {
-            textureWidth = width;
-            textureHeight = height;
+            mTextureWidth = width;
+            mTextureHeight = height;
             RecalculateTextureAtlas();
         }
 
         public Texture2D GetTexture()
         {
-            return texture;
+            return mTexture;
         }
 
         public Material GetMaterial()
         {
-            return material;
+            return mMaterial;
         }
 
         /**
          * <summary>Calculate required data for the texture atlas.</summary>
          * <param name="textures">The textures to compile into the atlas.</param>
          */
-        private void CalculateTextureAtlas(List<ClientAtlasTexture> textures)
+        private void CalculateTextureAtlas(List<ClientAtlasTexture> atlasTextures)
         {
-            int numOfRows = (int)Mathf.Ceil(Mathf.Sqrt(textures.Count));
-            this.numberOfRows = numOfRows;
+            int numOfRows = (int)Mathf.Ceil(Mathf.Sqrt(atlasTextures.Count));
+            mNumberOfRows = numOfRows;
 
-            int w = textureWidth * numOfRows;
-            int h = textureHeight * numOfRows;
+            int atlasWidth = mTextureWidth * numOfRows;
+            int atlasHeight = mTextureHeight * numOfRows;
 
             // If there are no textures in the texture atlas.
-            if(w == 0 || h == 0)
+            if(atlasWidth == 0 || atlasHeight == 0)
             {
-                texture = new Texture2D(1, 1);
+                mTexture = new Texture2D(1, 1);
                 return;
             }
 
-            List<Texture2D> texData = new List<Texture2D>();
-            textures.ForEach(text => {
-                Texture2D realText = Resources.Load<Texture2D>(text.Location);
-                Texture2D cloneText = new Texture2D(realText.width, realText.height);
-                cloneText.SetPixels(realText.GetPixels());
-                cloneText.Apply();
-                texData.Add(cloneText);
+            List<Texture2D> textures = new List<Texture2D>();
+            atlasTextures.ForEach(atlasTexture => {
+                Texture2D texture = GetTexture(atlasTexture);
+                if (texture == null)
+                {
+                    Cubivox.GetInstance().GetLogger().Error($"Failed to load atlas texture {atlasTexture.Location}, resource not found!");
+                    return;
+                }
+                textures.Add(texture);
             });
 
-            Texture2D atlas = new Texture2D(w, h);
+            Texture2D atlas = new Texture2D(atlasWidth, atlasHeight);
 
-            int i = 0;
-            for (int y = 0; y < h; y += textureHeight)
+            int index = 0;
+            for (int y = 0; y < atlasHeight; y += mTextureHeight)
             {
-                for (int x = 0; x < w; x += textureWidth)
+                for (int x = 0; x < atlasWidth; x += mTextureWidth)
                 {
-                    if (i >= texData.Count) break;
+                    if (index >= textures.Count) break;
 
-                    atlas.SetPixels(x, y, textureWidth, textureHeight, Resize(texData[i], textureWidth, textureHeight).GetPixels());
-                    textures[i].Init(i, GetXOffset(i), GetYOffset(i));
-                    i++;
+                    atlas.SetPixels(x, y, mTextureWidth, mTextureHeight, Resize(textures[index], mTextureWidth, mTextureHeight).GetPixels());
+                    atlasTextures[index].Init(index, GetXOffset(index), GetYOffset(index));
+                    index++;
                 }
             }
             atlas.Apply();
-            texture = atlas;
+            mTexture = atlas;
         }
 
         /**
@@ -176,9 +180,47 @@ namespace CubivoxClient.Texturing
             return result;
         }
 
-        public AtlasTexture CreateAtlasTexture(string location)
+        private Texture2D GetTexture(AtlasTexture atlasTexture)
         {
-            return new ClientAtlasTexture(location);
+            switch(atlasTexture.Root)
+            {
+                case TextureRoot.CUBIVOX:
+                    Texture2D realText = Resources.Load<Texture2D>(atlasTexture.Location);
+                    if( realText == null )
+                    {
+                        return null;
+                    }
+                    Texture2D cloneText = new Texture2D(realText.width, realText.height);
+                    cloneText.SetPixels(realText.GetPixels());
+                    cloneText.Apply();
+                    return cloneText;
+                case TextureRoot.EMBEDDED:
+                    Texture2D outputTexture = new Texture2D(2, 2);
+                    using (Stream textureStream = atlasTexture.GetEmbeddedResourceStream())
+                    {
+                        if( textureStream == null )
+                        {
+                            return null;
+                        }
+                        using (MemoryStream memoryStream = new MemoryStream())
+                        {
+                            textureStream.CopyTo(memoryStream);
+                            if( !ImageConversion.LoadImage(outputTexture, memoryStream.ToArray()) )
+                            {
+                                return null;
+                            }
+                        }
+                    }
+
+                    return outputTexture;
+            }
+
+            throw new Exception("Not all texture locations are handled!");
+        }
+
+        public AtlasTexture CreateAtlasTexture(Mod mod, TextureRoot root, string location)
+        {
+            return new ClientAtlasTexture(mod, root, location);
         }
     }
 }

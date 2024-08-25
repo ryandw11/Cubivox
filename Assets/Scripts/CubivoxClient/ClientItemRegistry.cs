@@ -1,4 +1,5 @@
-﻿using CubivoxCore;
+﻿using CubivoxClient.Texturing;
+using CubivoxCore;
 using CubivoxCore.Items;
 using CubivoxCore.Voxels;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ namespace CubivoxClient
 {
     public class ClientItemRegistry : ItemRegistry
     {
+        private ClientTextureAtlas textureAtlas;
         private Dictionary<ControllerKey, Item> itemDictionary;
 
         // Global Voxel Id Map
@@ -15,8 +17,9 @@ namespace CubivoxClient
         private Dictionary<VoxelDef, short> reverseVoxelMap;
         private short currentVoxelIndex;
 
-        public ClientItemRegistry()
+        public ClientItemRegistry(ClientTextureAtlas textureAtlas)
         {
+            this.textureAtlas = textureAtlas;
             itemDictionary = new Dictionary<ControllerKey, Item>();
             voxelMap = new Dictionary<short, VoxelDef>();
             reverseVoxelMap = new Dictionary<VoxelDef, short>();
@@ -38,11 +41,17 @@ namespace CubivoxClient
             itemDictionary.Add(item.GetControllerKey(), item);
 
             // Keep track of the voxel map.
-            if(item is VoxelDef)
+            VoxelDef voxelDef = item as VoxelDef;
+            if(item != null)
             {
-                voxelMap[currentVoxelIndex] = (VoxelDef) item;
-                reverseVoxelMap[(VoxelDef)item] = currentVoxelIndex;
+                voxelMap[currentVoxelIndex] = voxelDef;
+                reverseVoxelMap[voxelDef] = currentVoxelIndex;
                 currentVoxelIndex++;
+
+                if (voxelDef.GetAtlasTexture() != null)
+                {
+                    textureAtlas.RegisterTexture(voxelDef.GetAtlasTexture(), false);
+                }
             }
         }
 
