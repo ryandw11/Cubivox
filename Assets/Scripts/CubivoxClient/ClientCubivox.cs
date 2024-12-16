@@ -27,6 +27,7 @@ using CubivoxClient.Texturing;
 using UnityEngine;
 using CubivoxClient.Mods;
 using CubivoxCore.Scheduler;
+using CubivoxClient.Networking;
 
 namespace CubivoxClient
 {
@@ -88,6 +89,8 @@ namespace CubivoxClient
             textureAtlas = new ClientTextureAtlas(new List<ClientAtlasTexture>());
             itemRegistry = new ClientItemRegistry((ClientTextureAtlas) textureAtlas);
             eventManager = new ClientEventManager();
+            transportRegistry = new ClientTransportRegistry();
+
             players = new List<ClientPlayer>();
             packetList = new Dictionary<byte, ClientBoundPacket>();
 
@@ -106,6 +109,7 @@ namespace CubivoxClient
             RegisterClientBoundPacket(new CBPlaceVoxelPacket());
             RegisterClientBoundPacket(new CBLoadChunkPacket());
             RegisterClientBoundPacket(new CBChatMessagePacket());
+            RegisterClientBoundPacket(new ClientTransportPacket());
 
             mainThread = Thread.CurrentThread;
         }
@@ -326,7 +330,7 @@ namespace CubivoxClient
             }
         }
 
-        public async void Update()
+        public void Update()
         {
 
             if(CurrentState == GameState.CONNECTED_LOADING)
@@ -387,6 +391,7 @@ namespace CubivoxClient
             catch (Exception ex)
             {
                 GetLogger().Error("[Networking | ERROR] Unable to process packets from server, disconnecting...");
+                GetLogger().Error(ex.Message);
                 GetLogger().Error(ex.StackTrace);
                 DisconnectClient("Invalid response recieved from server.");
             }

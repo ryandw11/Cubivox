@@ -13,4 +13,13 @@ public class NetworkingUtils
             buffIndex += stream.Read(buffer, buffIndex, buffer.Length - buffIndex);
         }
     }
+
+    public static void ReadFromNetwork(byte[] buffer, int count, NetworkStream stream)
+    {
+        int buffIndex = 0;
+        while (buffIndex < count)
+        {
+            buffIndex += stream.Read(buffer, buffIndex, count - buffIndex);
+        }
+    }
 }
