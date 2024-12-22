@@ -10,8 +10,6 @@ using CubivoxCore.Utils;
 using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
 
-using CubivoxClient.Voxels;
-
 using CubivoxRender;
 
 using Unity.Collections;

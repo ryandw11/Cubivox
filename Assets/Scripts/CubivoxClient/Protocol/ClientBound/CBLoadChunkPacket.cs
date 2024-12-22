@@ -1,4 +1,3 @@
-using CubivoxClient.BaseGame;
 using CubivoxClient.Texturing;
 using CubivoxClient.Worlds;
 using CubivoxCore;

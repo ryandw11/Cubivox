@@ -10,8 +10,6 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
 
-using CubivoxClient.BaseGame;
-
 namespace CubivoxRender
 {
     [BurstCompile(CompileSynchronously = true)]

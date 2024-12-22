@@ -15,7 +15,6 @@ using CubivoxCore.Players;
 using CubivoxCore.Worlds;
 using CubivoxCore.Worlds.Generation;
 
-using CubivoxClient.BaseGame;
 using CubivoxClient.Events;
 using CubivoxClient.Loggers;
 using CubivoxClient.Players;
@@ -139,11 +138,7 @@ namespace CubivoxClient
 
         public override void LoadItemsStage(ItemRegistry itemRegistry)
         {
-            itemRegistry.RegisterItem(new AirVoxel());
-
-            // TODO: Modify RegisterItem to also register the texture.
-            TestVoxel testVoxel = new TestVoxel(this);
-            itemRegistry.RegisterItem(testVoxel);
+            RegisterBaseGameVoxels();
         }
 
         public override void LoadGeneratorsStage(GeneratorRegistry generatorRegistry)

@@ -6,7 +6,6 @@ using CubivoxCore.Voxels;
 using CubivoxClient;
 using CubivoxClient.Protocol.ServerBound;
 using CubivoxClient.Utils;
-using CubivoxClient.Voxels;
 using CubivoxClient.Worlds;
 
 using UnityEngine;

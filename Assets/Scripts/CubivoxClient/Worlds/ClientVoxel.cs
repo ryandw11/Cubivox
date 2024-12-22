@@ -3,11 +3,9 @@ using CubivoxCore.BaseGame.VoxelDefs;
 using CubivoxCore.Voxels;
 using CubivoxCore.Worlds;
 
-using CubivoxClient.Worlds;
-
 using CubivoxRender;
 
-namespace CubivoxClient.Voxels
+namespace CubivoxClient.Worlds
 {
     public class ClientVoxel : Voxel
     {
