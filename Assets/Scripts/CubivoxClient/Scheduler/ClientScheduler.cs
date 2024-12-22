@@ -41,10 +41,14 @@ namespace CubivoxClient.Scheduler
 
         private InternalScheduler mScheduler;
 
+        void Awake()
+        {
+            mScheduler = new InternalScheduler(Thread.CurrentThread);
+        }
+
         // Start is called before the first frame update
         void Start()
         {
-            mScheduler = new InternalScheduler(Thread.CurrentThread);
         }
 
         // Update is called once per frame

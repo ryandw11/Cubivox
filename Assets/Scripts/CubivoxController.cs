@@ -29,6 +29,15 @@ public class CubivoxController : MonoBehaviour
 
     private static CubivoxController instance;
 
+    class CubivoxConnectionInfo
+    {
+        public string ip;
+        public int port;
+        public string username;
+    }
+
+    private static CubivoxConnectionInfo? connectionInfo = null;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -61,6 +70,12 @@ public class CubivoxController : MonoBehaviour
         {
             clientCubivox = ClientCubivox.GetClientInstance();
         }
+
+        if( connectionInfo != null )
+        {
+            clientCubivox.ConnectToServer(connectionInfo.ip, connectionInfo.port, connectionInfo.username);
+            connectionInfo = null;
+        }
     }
 
     // Update is called once per frame
@@ -72,6 +87,22 @@ public class CubivoxController : MonoBehaviour
     void OnApplicationQuit()
     {
         clientCubivox.OnApplicationQuit();
+    }
+
+    /// <summary>
+    /// Ask the CubivoxController to connect to the server when the main game scene loads.
+    /// 
+    /// <para>This is kind of a hacky work around where the server can sends packets back before the scene loads all the way.</para>
+    /// </summary>
+    /// <param name="ip">The ip of the server.</param>
+    /// <param name="port">The port</param>
+    /// <param name="username">The username that the user wants to use.</param>
+    public void PrepareConnectToServer(string ip, int port, string username)
+    {
+        connectionInfo = new CubivoxConnectionInfo();
+        connectionInfo.username = username;
+        connectionInfo.port = port;
+        connectionInfo.ip = ip;
     }
 
     public ClientCubivox GetCubivox()
