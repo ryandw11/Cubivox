@@ -200,4 +200,113 @@ namespace CubivoxRender
             [5] = 0
         };
     }
+
+    /// <summary>
+    /// Mesh data for a single voxel.
+    /// </summary>
+    public sealed class VoxelData
+    {
+        public static readonly List<Vector3> Vertices = new List<Vector3>
+        {
+            // Front face
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+
+            // Back face
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f),
+
+            // Left face
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(-0.5f, 0.5f, 0.5f),
+
+            // Right face
+            new Vector3(0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+
+            // Top face
+            new Vector3(-0.5f, 0.5f, -0.5f),
+            new Vector3(-0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, 0.5f),
+            new Vector3(0.5f, 0.5f, -0.5f),
+
+            // Bottom face
+            new Vector3(-0.5f, -0.5f, -0.5f),
+            new Vector3(-0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, 0.5f),
+            new Vector3(0.5f, -0.5f, -0.5f)
+        };
+
+        public const float ONE_THIRD = 1f / 3f;
+        public const float TWO_THIRD = 2f / 3f;
+
+        [ReadOnly]
+        public static readonly List<Vector2> TextureCoordinates = new List<Vector2>
+        {
+            // FRONT face
+            new Vector2(0.25f, TWO_THIRD),
+            new Vector2(0.25f, ONE_THIRD),
+            new Vector2(0.5f, ONE_THIRD),
+            new Vector2(0.5f, TWO_THIRD),
+
+            // BACK face
+            new Vector2(1, TWO_THIRD),
+            new Vector2(1, ONE_THIRD),
+            new Vector2(0.75f, ONE_THIRD),
+            new Vector2(0.75f, TWO_THIRD),
+
+            // LEFT face
+            new Vector2(0.25f, TWO_THIRD),
+            new Vector2(0.25f, ONE_THIRD),
+            new Vector2(0, ONE_THIRD),
+            new Vector2(0, TWO_THIRD),
+
+            // RIGHT face
+            new Vector2(0.75f, TWO_THIRD),
+            new Vector2(0.75f, ONE_THIRD),
+            new Vector2(0.5f, ONE_THIRD),
+            new Vector2(0.5f, TWO_THIRD),
+
+            // TOP face
+            new Vector2(0.25f, TWO_THIRD),
+            new Vector2(0.25f, 1f),
+            new Vector2(0.5f, 1f),
+            new Vector2(0.5f, TWO_THIRD),
+
+            // BOTTOM face
+            new Vector2(0.25f, ONE_THIRD),
+            new Vector2(0.25f, 0),
+            new Vector2(0.5f, 0),
+            new Vector2(0.5f, ONE_THIRD)
+        };
+
+        public static readonly List<int> Indices = new List<int>
+        {
+            // FRONT face
+            0, 3, 2, 2, 1, 0,
+
+            // BOTTOM face
+            4, 7, 6, 6, 5, 4,
+
+            // BACK face
+            8, 9, 10, 10, 11, 8,
+
+            // LEFT face
+            12, 13, 14, 14, 15, 12,
+
+            // RIGHT face
+            16, 17, 18, 18, 19, 16,
+
+            // TOP face
+            20, 21, 22, 22, 23, 20
+        };
+    }
 }

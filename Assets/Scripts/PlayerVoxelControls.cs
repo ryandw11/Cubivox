@@ -9,6 +9,7 @@ using CubivoxClient.Utils;
 using CubivoxClient.Worlds;
 
 using UnityEngine;
+using CubivoxCore.BaseGame;
 
 /// <summary>
 /// Responsible for handling the Player's voxel place and breaking controls.
@@ -56,7 +57,7 @@ public class PlayerVoxelControls : MonoBehaviour
                 Vector3 position = ray.origin + (ray.direction * step);
 
                 ClientWorld currentWorld = WorldManager.GetInstance().GetCurrentWorld();
-                VoxelDef air = (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR"));
+                VoxelDef air = (VoxelDef)Cubivox.GetItemRegistry().GetItem(Voxels.AIR);
 
                 position.x = Mathf.FloorToInt(position.x);
                 position.y = Mathf.FloorToInt(position.y);
@@ -107,7 +108,7 @@ public class PlayerVoxelControls : MonoBehaviour
                 position.z = Mathf.FloorToInt(position.z);
 
                 ClientWorld currentWorld = WorldManager.GetInstance().GetCurrentWorld();
-                VoxelDef air = (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "AIR"));
+                VoxelDef air = (VoxelDef)Cubivox.GetItemRegistry().GetItem(Voxels.AIR);
 
                 Voxel voxel = currentWorld.GetVoxel((int)position.x, (int)position.y, (int)position.z);
 
@@ -115,7 +116,8 @@ public class PlayerVoxelControls : MonoBehaviour
                 {
                     Vector3 realVoxelPos = new Vector3((int)position.x, (int)position.y, (int)position.z);
 
-                    VoxelDef testBlock = (VoxelDef)Cubivox.GetItemRegistry().GetItem(new ControllerKey(Cubivox.GetInstance(), "TESTBLOCK"));
+                    // Get the current voxel that the user has selected.
+                    VoxelDef placeVoxel = CurrentVoxel.GetInstance().GetCurrentVoxel();
                     Vector3 newPlacement = NewBlock(realVoxelPos, ray);
 
                     var newVoxelLocation = LocationUtils.VectorToLocation(newPlacement);
@@ -124,16 +126,16 @@ public class PlayerVoxelControls : MonoBehaviour
                     // Priority: 1) VoxelDef Events, 2) General Events
 
                     VoxelDefPlaceEvent voxelDefPlaceEvent = new VoxelDefPlaceEvent(clientCubivox.LocalPlayer, newVoxelLocation);
-                    Isolator.Isolate(() => testBlock._PlaceEvent?.Invoke(voxelDefPlaceEvent));
+                    Isolator.Isolate(() => placeVoxel._PlaceEvent?.Invoke(voxelDefPlaceEvent));
                     if (voxelDefPlaceEvent.IsCancelled)
                     {
                         return;
                     }
 
-                    VoxelPlaceEvent voxelPlaceEvent = new VoxelPlaceEvent(clientCubivox.LocalPlayer, new ClientVoxel(newVoxelLocation, testBlock));
+                    VoxelPlaceEvent voxelPlaceEvent = new VoxelPlaceEvent(clientCubivox.LocalPlayer, new ClientVoxel(newVoxelLocation, placeVoxel));
                     if (Cubivox.GetEventManager().TriggerEvent(voxelPlaceEvent))
                     {
-                        clientCubivox.SendPacketToServer(new PlaceVoxelPacket(testBlock, newVoxelLocation));
+                        clientCubivox.SendPacketToServer(new PlaceVoxelPacket(placeVoxel, newVoxelLocation));
                     }
 
                     return;

@@ -80,5 +80,10 @@ namespace CubivoxClient
 
             return null;
         }
+
+        public Dictionary<short, VoxelDef> GetVoxelMap()
+        {
+            return voxelMap;
+        }
     }
 }
