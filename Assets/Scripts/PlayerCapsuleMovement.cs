@@ -58,7 +58,7 @@ public class PlayerCapsuleMovement : MonoBehaviour
             // Reset position if the event fails.
             transform.position = previousPosition;
             // Zero out the velocity.
-            rigidbody.velocity = Vector3.zero;
+            rigidbody.linearVelocity = Vector3.zero;
         }
 
         // Note: The player's location can be modified by the event.

@@ -118,9 +118,9 @@ namespace CubivoxClient.Worlds
                     jobHandle.Complete();
                     var mesh = new Mesh
                     {
-                        vertices = meshOutput.vertices.ToArray().Select(vertex => new Vector3(vertex.x, vertex.y, vertex.z)).ToArray(),
-                        triangles = meshOutput.indicies.ToArray(),
-                        uv = meshOutput.textures.ToArray().Select(vertex => new Vector2(vertex.x, vertex.y)).ToArray()
+                        vertices = meshOutput.vertices.Select(vertex => new Vector3(vertex.x, vertex.y, vertex.z)).ToArray(),
+                        triangles = meshOutput.indicies.AsSharpArray(),
+                        uv = meshOutput.textures.Select(vertex => new Vector2(vertex.x, vertex.y)).ToArray()
                     };
                     vertices.Dispose();
                     indicies.Dispose();
@@ -248,6 +248,5 @@ namespace CubivoxClient.Worlds
             };
             return renderVoxel;
         }
-
     }
 }
