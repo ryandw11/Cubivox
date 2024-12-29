@@ -28,6 +28,10 @@ public class CuboidDebugger : MonoBehaviour
 
     void OnDrawGizmos()
     {
+        if( currentChunkCuboid == null )
+        {
+            return;
+        }
         if( ToVec3(currentChunkCuboid.MinCorner) != min || ToVec3(currentChunkCuboid.MaxCorner) != max)
         {
             currentChunkCuboid = new Cuboid(
