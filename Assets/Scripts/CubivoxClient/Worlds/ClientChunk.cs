@@ -23,6 +23,7 @@ namespace CubivoxClient.Worlds
     public class ClientChunk : MonoBehaviour, Chunk
     {
         public static readonly int CHUNK_SIZE = 16;
+        public bool ShowDebugLines = false;
 
         private byte[,,] voxels = new byte[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
         private Dictionary<byte, short> voxelMap = new Dictionary<byte, short>();
@@ -40,7 +41,7 @@ namespace CubivoxClient.Worlds
 
         private ClientTextureAtlas clientTextureAtlas;
 
-        public Location GetLocation()
+        public ChunkLocation GetLocation()
         {
             return LocationUtils.ChunkTransformVectorToChunkLocation(transform.position);
         }
@@ -91,6 +92,16 @@ namespace CubivoxClient.Worlds
             throw new InvalidEnvironmentException("Regenerating a Chunk can only be done on the server!");
         }
 
+        public ChunkBulkEditor StartBulkEdit()
+        {
+            throw new InvalidEnvironmentException("Bulk edits can only be done on the server!");
+        }
+
+        public void SubmitBulkEdit(ChunkBulkEditor chunkBulkEditor)
+        {
+            throw new InvalidEnvironmentException("Bulk edits can only be done on the server!");
+        }
+
         public void PopulateChunk(byte[,,] voxels, Dictionary<byte, short> voxelMap, byte currentVoxelIndex)
         {
             lock( mLock )
@@ -106,6 +117,28 @@ namespace CubivoxClient.Worlds
         {
             clientTextureAtlas = (ClientTextureAtlas) ClientCubivox.GetTextureAtlas();
             clientTextureAtlas.AtlasRecalculatedEvent += HandleAtlasUpdate;
+        }
+
+        void OnDrawGizmos()
+        {
+            if( !ShowDebugLines )
+            {
+                return;
+            }
+
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(16f, 0, 0), Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 16, 0), Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 0, 16), Color.green);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 0, 16), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 16, 0), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(0, 16, 16), Color.red);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(0, 0, 16), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(16, 0, 0), Color.red);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(0, 16, 16), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(16, 16, 0), Color.red);
         }
 
         // Update is called once per frame

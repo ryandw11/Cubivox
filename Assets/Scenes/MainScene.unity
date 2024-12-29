@@ -190,6 +190,7 @@ GameObject:
   m_Component:
   - component: {fileID: 170156506}
   - component: {fileID: 170156507}
+  - component: {fileID: 170156508}
   m_Layer: 0
   m_Name: World Manager
   m_TagString: Untagged
@@ -224,6 +225,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a1b06ebf3c8e5824b8e0075f93cfebf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &170156508
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 170156505}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2fa792e3e8729114392d44ec0de9e8a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  min: {x: 14, y: 0, z: -2}
+  max: {x: 34, y: 16, z: 18}
 --- !u!1 &178691134
 GameObject:
   m_ObjectHideFlags: 0
