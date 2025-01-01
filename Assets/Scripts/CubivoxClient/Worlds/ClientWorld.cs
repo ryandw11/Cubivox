@@ -45,7 +45,7 @@ namespace CubivoxClient.Worlds
 
             Chunk chunk = GetChunk(chunkX, chunkY, chunkZ);
 
-            if (chunk == null) return null;
+            if (chunk == null) { Debug.Log("NULL!"); return null;  }
 
             return chunk.GetVoxel(x, y, z);
         }

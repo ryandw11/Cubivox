@@ -65,10 +65,12 @@ public class CubivoxController : MonoBehaviour
                 System.Random rand = new System.Random();
                 clientCubivox.ConnectToServer("localhost", 5555, $"Test{rand.Next(0, 100)}");
             }
+            clientCubivox.Start();
         }
         else
         {
             clientCubivox = ClientCubivox.GetClientInstance();
+            clientCubivox.Start();
         }
 
         if( connectionInfo != null )

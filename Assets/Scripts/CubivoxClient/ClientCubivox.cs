@@ -325,6 +325,15 @@ namespace CubivoxClient
             }
         }
 
+        /// <summary>
+        /// Called on every Start (whether on title screen or plaing the game).
+        /// </summary>
+        public void Start()
+        {
+            // This will be null if on the title screen.
+            hud = ClientHud.GetInstance();
+        }
+
         public void Update()
         {
 

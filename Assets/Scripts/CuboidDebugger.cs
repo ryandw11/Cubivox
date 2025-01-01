@@ -40,11 +40,11 @@ public class CuboidDebugger : MonoBehaviour
             );
             ObtainChunkBulkEdits(currentChunkCuboid);
         }
-        DrawCube(min, max, Color.green);
+        DrawCube(min, max, UnityEngine.Color.green);
         foreach (var chunk in chunks)
         {
             var cuboid = chunk.AsCuboid();
-            DrawCube(ToVec3(cuboid.MinCorner), ToVec3(cuboid.MaxCorner), Color.red);
+            DrawCube(ToVec3(cuboid.MinCorner), ToVec3(cuboid.MaxCorner), UnityEngine.Color.red);
         }
     }
 
@@ -53,7 +53,7 @@ public class CuboidDebugger : MonoBehaviour
         return new Vector3((float) loc.x, (float) loc.y, (float) loc.z);
     }
 
-    void DrawCube(Vector3 min, Vector3 max, Color color)
+    void DrawCube(Vector3 min, Vector3 max, UnityEngine.Color color)
     {
         max += new Vector3(0.999f, 0.999f, 0.999f);
 

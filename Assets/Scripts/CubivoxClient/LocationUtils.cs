@@ -24,9 +24,9 @@ namespace CubivoxClient
             return new Location(vector.x, vector.y, vector.z);
         }
 
-        public static ChunkLocation ChunkTransformVectorToChunkLocation(Vector3 vector)
+        public static ChunkLocation ChunkTransformVectorToChunkLocation(World world, Vector3 vector)
         {
-            return new ChunkLocation(null, Mathf.FloorToInt(vector.x / 16), Mathf.FloorToInt(vector.y / 16), Mathf.FloorToInt(vector.z / 16));
+            return new ChunkLocation(world, Mathf.FloorToInt(vector.x / 16), Mathf.FloorToInt(vector.y / 16), Mathf.FloorToInt(vector.z / 16));
         }
     }
 }

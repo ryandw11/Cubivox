@@ -43,7 +43,7 @@ namespace CubivoxClient.Worlds
 
         public ChunkLocation GetLocation()
         {
-            return LocationUtils.ChunkTransformVectorToChunkLocation(transform.position);
+            return LocationUtils.ChunkTransformVectorToChunkLocation(GetWorld(), transform.position);
         }
 
         public Voxel GetVoxel(int x, int y, int z)
@@ -126,19 +126,19 @@ namespace CubivoxClient.Worlds
                 return;
             }
 
-            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(16f, 0, 0), Color.green);
-            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 16, 0), Color.green);
-            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 0, 16), Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(16f, 0, 0), UnityEngine.Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 16, 0), UnityEngine.Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 0, 16), UnityEngine.Color.green);
 
-            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 0, 16), Color.red);
-            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 16, 0), Color.red);
-            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(0, 16, 16), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 0, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 16, 0), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(0, 16, 16), UnityEngine.Color.red);
 
-            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(0, 0, 16), Color.red);
-            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(16, 0, 0), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(0, 0, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(16, 0, 0), UnityEngine.Color.red);
 
-            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(0, 16, 16), Color.red);
-            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(16, 16, 0), Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(0, 16, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(16, 16, 0), UnityEngine.Color.red);
         }
 
         // Update is called once per frame
