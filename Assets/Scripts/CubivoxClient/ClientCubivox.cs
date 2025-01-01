@@ -397,6 +397,11 @@ namespace CubivoxClient
                 GetLogger().Error("[Networking | ERROR] Unable to process packets from server, disconnecting...");
                 GetLogger().Error(ex.Message);
                 GetLogger().Error(ex.StackTrace);
+                if(ex.InnerException != null)
+                {
+                    GetLogger().Error(ex.InnerException.Message);
+                    GetLogger().Error(ex.InnerException.StackTrace);
+                }
                 DisconnectClient("Invalid response recieved from server.");
             }
         }
