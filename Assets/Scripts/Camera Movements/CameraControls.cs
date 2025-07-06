@@ -58,7 +58,7 @@ public class CameraControls : MonoBehaviour
             }
             if (Input.GetKey(KeyCode.R)) // Resets Velocity so that when the camera is going crazy it will be fixed
             {
-                GetComponent<Rigidbody>().velocity = Vector3.zero;
+                GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
                 GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
             }
 

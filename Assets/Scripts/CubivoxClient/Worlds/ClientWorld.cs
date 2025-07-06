@@ -13,13 +13,13 @@ namespace CubivoxClient.Worlds
     public class ClientWorld : World
     {
         private Location spawnLocation;
-        private ConcurrentDictionary<Location, ClientChunk> loadedChunks;
+        private ConcurrentDictionary<ChunkLocation, ClientChunk> loadedChunks;
         private int renderDistance = 16;
 
         public ClientWorld()
         {
             this.spawnLocation = new Location(0, 0, 0);
-            loadedChunks = new ConcurrentDictionary<Location, ClientChunk>();
+            loadedChunks = new ConcurrentDictionary<ChunkLocation, ClientChunk>();
         }
 
         public void AddLoadedChunk(ClientChunk chunk)
@@ -45,12 +45,12 @@ namespace CubivoxClient.Worlds
 
             Chunk chunk = GetChunk(chunkX, chunkY, chunkZ);
 
-            if (chunk == null) return null;
+            if (chunk == null) { Debug.Log("NULL!"); return null;  }
 
             return chunk.GetVoxel(x, y, z);
         }
 
-        public bool IsChunkLoaded(Location location)
+        public bool IsChunkLoaded(ChunkLocation location)
         {
             ClientChunk output;
             if (loadedChunks.TryGetValue(location, out output))
@@ -63,7 +63,7 @@ namespace CubivoxClient.Worlds
 
         public bool IsChunkLoaded(int x, int y, int z)
         {
-            return IsChunkLoaded(new Location(x, y, z));
+            return IsChunkLoaded(new ChunkLocation(this, x, y, z));
         }
 
         public bool IsChunkLoaded(Chunk chunk)
@@ -71,22 +71,7 @@ namespace CubivoxClient.Worlds
             return IsChunkLoaded(chunk.GetLocation());
         }
 
-        public void LoadChunk(Location location)
-        {
-            throw new InvalidEnvironmentException("The client cannot load chunks!");
-        }
-
-        public void LoadChunk(int x, int y, int z)
-        {
-            throw new InvalidEnvironmentException("The client cannot load chunks!");
-        }
-
-        public void LoadChunk(Chunk chunk)
-        {
-            throw new InvalidEnvironmentException("The client cannot load chunks!");
-        }
-
-        public Chunk GetChunk(Location location)
+        public Chunk GetChunk(ChunkLocation location)
         {
             ClientChunk output;
             if (loadedChunks.TryGetValue(location, out output))
@@ -99,12 +84,7 @@ namespace CubivoxClient.Worlds
 
         public Chunk GetChunk(int x, int y, int z)
         {
-            return GetChunk(new Location(x, y, z));
-        }
-
-        public void Save()
-        {
-            throw new InvalidEnvironmentException("The client cannot initiate a save of the world!");
+            return GetChunk(new ChunkLocation(this, x, y, z));
         }
 
         public void SetVoxel(int x, int y, int z, VoxelDef voxel)
@@ -124,17 +104,7 @@ namespace CubivoxClient.Worlds
             chunk.SetVoxel(x, y, z, voxel);
         }
 
-        public void UnloadChunk(int x, int y, int z)
-        {
-            throw new InvalidEnvironmentException("The client cannot unload chunks!");
-        }
-
-        public void UnloadChunk(Chunk chunk)
-        {
-            throw new InvalidEnvironmentException("The client cannot unload chunks!");
-        }
-
-        public ConcurrentDictionary<Location, ClientChunk> GetLoadedChunks()
+        public ConcurrentDictionary<ChunkLocation, ClientChunk> GetLoadedChunks()
         {
             return loadedChunks;
         }
@@ -142,6 +112,11 @@ namespace CubivoxClient.Worlds
         public WorldGenerator GetGenerator()
         {
             throw new InvalidEnvironmentException("Generators only exist on the server.");
+        }
+
+        public WorldBulkEditor StartBulkEdit(Cuboid editCuboid)
+        {
+            throw new InvalidEnvironmentException("Bulk edits are only available on the server.");
         }
     }
 }

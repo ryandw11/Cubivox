@@ -23,6 +23,7 @@ namespace CubivoxClient.Worlds
     public class ClientChunk : MonoBehaviour, Chunk
     {
         public static readonly int CHUNK_SIZE = 16;
+        public bool ShowDebugLines = false;
 
         private byte[,,] voxels = new byte[CHUNK_SIZE, CHUNK_SIZE, CHUNK_SIZE];
         private Dictionary<byte, short> voxelMap = new Dictionary<byte, short>();
@@ -40,9 +41,9 @@ namespace CubivoxClient.Worlds
 
         private ClientTextureAtlas clientTextureAtlas;
 
-        public Location GetLocation()
+        public ChunkLocation GetLocation()
         {
-            return LocationUtils.ChunkTransformVectorToChunkLocation(transform.position);
+            return LocationUtils.ChunkTransformVectorToChunkLocation(GetWorld(), transform.position);
         }
 
         public Voxel GetVoxel(int x, int y, int z)
@@ -91,6 +92,16 @@ namespace CubivoxClient.Worlds
             throw new InvalidEnvironmentException("Regenerating a Chunk can only be done on the server!");
         }
 
+        public ChunkBulkEditor StartBulkEdit()
+        {
+            throw new InvalidEnvironmentException("Bulk edits can only be done on the server!");
+        }
+
+        public void SubmitBulkEdit(ChunkBulkEditor chunkBulkEditor)
+        {
+            throw new InvalidEnvironmentException("Bulk edits can only be done on the server!");
+        }
+
         public void PopulateChunk(byte[,,] voxels, Dictionary<byte, short> voxelMap, byte currentVoxelIndex)
         {
             lock( mLock )
@@ -108,6 +119,28 @@ namespace CubivoxClient.Worlds
             clientTextureAtlas.AtlasRecalculatedEvent += HandleAtlasUpdate;
         }
 
+        void OnDrawGizmos()
+        {
+            if( !ShowDebugLines )
+            {
+                return;
+            }
+
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(16f, 0, 0), UnityEngine.Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 16, 0), UnityEngine.Color.green);
+            Debug.DrawLine(transform.localPosition, transform.localPosition + new Vector3(0f, 0, 16), UnityEngine.Color.green);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 0, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(16, 16, 0), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 16f, 16f), transform.localPosition + new Vector3(0, 16, 16), UnityEngine.Color.red);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(0, 0, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(16f, 0, 16f), transform.localPosition + new Vector3(16, 0, 0), UnityEngine.Color.red);
+
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(0, 16, 16), UnityEngine.Color.red);
+            Debug.DrawLine(transform.localPosition + new Vector3(0, 16, 0), transform.localPosition + new Vector3(16, 16, 0), UnityEngine.Color.red);
+        }
+
         // Update is called once per frame
         void Update()
         {
@@ -118,9 +151,9 @@ namespace CubivoxClient.Worlds
                     jobHandle.Complete();
                     var mesh = new Mesh
                     {
-                        vertices = meshOutput.vertices.ToArray().Select(vertex => new Vector3(vertex.x, vertex.y, vertex.z)).ToArray(),
-                        triangles = meshOutput.indicies.ToArray(),
-                        uv = meshOutput.textures.ToArray().Select(vertex => new Vector2(vertex.x, vertex.y)).ToArray()
+                        vertices = meshOutput.vertices.Select(vertex => new Vector3(vertex.x, vertex.y, vertex.z)).ToArray(),
+                        triangles = meshOutput.indicies.AsSharpArray(),
+                        uv = meshOutput.textures.Select(vertex => new Vector2(vertex.x, vertex.y)).ToArray()
                     };
                     vertices.Dispose();
                     indicies.Dispose();
@@ -248,6 +281,5 @@ namespace CubivoxClient.Worlds
             };
             return renderVoxel;
         }
-
     }
 }

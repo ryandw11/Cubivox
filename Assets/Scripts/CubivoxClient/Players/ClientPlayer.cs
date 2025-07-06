@@ -108,7 +108,7 @@ namespace CubivoxClient.Players
             {
                 // Update the Username billboard rotation.
                 transform.GetChild(0).transform.rotation = Camera.main.transform.rotation;
-                rigidbody.velocity = Vector3.zero;
+                rigidbody.linearVelocity = Vector3.zero;
             }
         }
 
